@@ -1,0 +1,6 @@
+
+
+SPEED_PLAYER = 10
+MAX_HP = 100
+
+POSITION_0 = (1, 1, 1)
