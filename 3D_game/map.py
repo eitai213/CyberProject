@@ -1,5 +1,5 @@
+import random
 import pygame as pg
-
 
 _ = False
 
@@ -11,7 +11,7 @@ mini_map = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, _, _, 1, 1, 1, 1, _, _, _, _, _, _, _, _, _, _, _, _, _, _, 1],
             [1, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, 1],
             [1, _, _, 1, _, _, _, 1, _, _, _, _, _, _, _, _, _, _, _, _, _, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ,1, 1, 1, 1, 1, 1],]
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
 
 class Map:
     def __init__(self, game):
@@ -19,13 +19,35 @@ class Map:
         self.mini_map = mini_map
         self.world_map = {}
         self.get_map()
+        self.x, self.y = self.treasure_place()
 
     def get_map(self):
         for j, row in enumerate(self.mini_map):
             for i, value in enumerate(row):
                 if value:
-                    self.world_map[(i,j)] = value
+                    self.world_map[(i, j)] = value
 
     def draw(self):
-        [pg.draw.rect(self.game.screen, 'darkgray', (pos[0] * 100, pos[1] * 100, 100, 100), 2)
-        for pos in self.world_map]
+        for pos in self.world_map:
+            if self.world_map[pos] == 1:
+                pg.draw.rect(self.game.screen, 'darkgray', (pos[0] * 100, pos[1] * 100, 100, 100), 2)
+
+
+        for pos, value in self.world_map.items():
+            if value == 2:
+                pg.draw.circle(self.game.screen, 'red', (pos[0] * 100 + 50, pos[1] * 100 + 50), 30)
+
+    def treasure_place(self):
+        y_max = len(self.mini_map) - 1
+        x_max = len(self.mini_map[0]) - 1
+        while True:
+            y = random.randint(0, y_max)
+            x = random.randint(0, x_max)
+            if self.mini_map[y][x] != 1:
+                self.mini_map[y][x] = 2
+                self.world_map[(x, y)] = 2
+                return x, y
+
+
+
+

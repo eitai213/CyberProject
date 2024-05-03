@@ -8,7 +8,7 @@ class RayCasting:
         self.game = game
 
     def ray_cast(self):
-        ox, oy, oz = self.game.player.pos
+        ox, oy = self.game.player.pos
         x_map, y_map = self.game.player.map_pos
 
         ray_angle = self.game.player.angle - HALF_FOV
@@ -55,8 +55,8 @@ class RayCasting:
             depth = min(depth_vert, depth_hor)
 
             # Draw for debug
-            #pg.draw.line(self.game.screen, 'yellow', (100 * ox, 100 * oy),
-            #             (100 * ox + 100 * depth * cos_a, 100 * oy + 100 * depth * sin_a), 2)
+            pg.draw.line(self.game.screen, 'yellow', (100 * ox, 100 * oy),
+                         (100 * ox + 100 * depth * cos_a, 100 * oy + 100 * depth * sin_a), 2)
 
             #remove fishbowl effect
             depth *= math.cos(self.game.player.angle - ray_angle)
@@ -67,8 +67,12 @@ class RayCasting:
 
             # draw walls
             color = [255 / (1 + depth ** 5 * 0.00002)] * 3
-            pg.draw.rect(self.game.screen, color,
-                         (ray * SCALE, HALF_HIGHT - proj_height // 2, SCALE, proj_height))
+            #pg.draw.rect(self.game.screen, color,
+            #             (ray * SCALE, HALF_HIGHT - proj_height // 2, SCALE, proj_height))
+            #pg.draw.rect(self.game.screen, color="red",
+
+
+
 
             # draw floor
 

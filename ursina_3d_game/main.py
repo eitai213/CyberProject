@@ -1,19 +1,19 @@
 from ursina import *
 import map
 import player
-import gun
+import weapon
+
 
 app = Ursina()
 
 map.Map()
-player.Player()
-
-a = gun.Gun()
+user = player.Player()
+gun = weapon.Gun()
 
 
 
 def update():
-    a.update()
+    gun.update()
 
 
 

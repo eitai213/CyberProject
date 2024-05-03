@@ -30,3 +30,11 @@ class Gun:
                 mouse.hovered_entity.hp -= 10
                 mouse.hovered_entity.blink(color.red)
 
+
+
+
+
+
+
+
+

@@ -12,7 +12,7 @@ app = Ursina()
 random.seed(0)
 Entity.default_shader = lit_with_shadows_shader
 
-ground = Entity(model='plane', collider='box', scale=64, texture='brick', texture_scale=(4,4))
+ground = Entity(model='cube', collider='box', scale=(100, 1, 100), texture='brick', texture_scale=(4,4))
 
 editor_camera = EditorCamera(enabled=False, ignore_paused=True)
 player = FirstPersonController(model='cube', z=-10, color=color.orange, origin_y=-.5, speed=8, collider='box')
@@ -37,6 +37,7 @@ for i in range(16):
 def update():
     if held_keys['left mouse']:
         shoot()
+
 
 def shoot():
     if not gun.on_cooldown:

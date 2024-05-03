@@ -29,8 +29,8 @@ class Game:
 
     def draw(self):
         self.screen.fill('black')
-        #self.map.draw()
-        #self.player.draw()
+        self.map.draw()
+        self.player.draw()
 
     def check_events(self):
         for event in pg.event.get():
@@ -39,13 +39,13 @@ class Game:
                 sys.exit()
 
     def run(self):
-        while True:
+        while (self.player.check_treasure_collision(self.map.x, self.map.y)):
             self.check_events()
             self.update()
             self.draw()
+        print("you win!!!!")
+
 
 
 app = Game()
 app.run()
-
-

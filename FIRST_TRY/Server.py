@@ -16,6 +16,7 @@ client_socket, client_address = server_socket.accept()
 print(f"Connection established with {client_address}")
 new_player = Player()
 new_player.random_position()
+
 new_player.set_player_num(player_num)
 data_players.append(new_player)
 client_socket.send(pickle.dumps([new_player, data_players]))

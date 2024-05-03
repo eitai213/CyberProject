@@ -3,15 +3,16 @@ import pygame as pg
 import math
 
 class Player:
-    def __init__(self, game):
+    def __init__(self, game, position=PLAYER_POS, num_player=0):
         self.game = game
-        self.x, self.y, self.z = PLAYER_POS
+        self.x, self.y = position
+        self.num_player = num_player
         self.angle = PLAYER_ANGLE
 
     def movement(self):
         sin_a = math.sin(self.angle)
         cos_a = math.cos(self.angle)
-        dx, dy, dz = 0, 0, 0
+        dx, dy = 0, 0
         speed = PLAYER_SPEED * self.game.delta_time
         speed_sin = speed * sin_a
         speed_cos = speed * cos_a
@@ -55,6 +56,14 @@ class Player:
         if self.check_wall(int(self.x), int(self.y + dy)):
             self.y += dy
 
+
+    def check_treasure_collision(self, x, y):
+        if self.x >= (x - 0.15) and self.x <= (x + 1) and self.y >= (y - 0.15) and self.y <= (y + 1):
+            return False
+        else:
+            return True
+
+
     def draw(self):
   #      pg.draw.line(self.game.screen, 'yellow', (self.x * 100, self.y * 100),
  #                    (self.x * 100 + WIDTH * math.cos(self.angle),
@@ -64,9 +73,16 @@ class Player:
     def update(self):
         self.movement()
 
+    def get_position(self):
+        return self.x, self.y
+
+    def get_num_player(self):
+        return self.num_player
+
+
     @property
     def pos(self):
-        return self.x, self.y, self.z
+        return self.x, self.y
 
     @property
     def map_pos(self):
