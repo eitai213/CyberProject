@@ -2,6 +2,7 @@ from setting import *
 from map import *
 from player import *
 from raycasting import *
+from sprite_object import *
 import pygame as pg
 import sys
 
@@ -10,6 +11,7 @@ import sys
 class Game:
     def __init__(self):
         pg.init()
+        pg.mouse.set_visible(False)
         self.screen = pg.display.set_mode(RES)
         self.clock = pg.time.Clock()
         self.delta_time = 1
@@ -19,18 +21,22 @@ class Game:
         self.map = Map(self)
         self.player = Player(self)
         self.raycasting = RayCasting(self)
+        self.static_sprite = SpriteObject(self)
+
 
     def update(self):
         self.player.update()
         self.raycasting.update()
+        self.static_sprite.update()
         pg.display.flip()
         self.delta_time = self.clock.tick(FPS)
         pg.display.set_caption("Game")
 
     def draw(self):
         self.screen.fill('black')
-        self.map.draw()
-        self.player.draw()
+        #self.map.draw()
+        #self.player.draw()
+
 
     def check_events(self):
         for event in pg.event.get():
