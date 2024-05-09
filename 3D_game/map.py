@@ -13,13 +13,29 @@ mini_map = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, _, _, 1, _, _, _, 1, _, _, _, _, _, _, _, _, _, _, _, _, _, 1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
 
+
+
+def treasure_place():
+    y_max = len(mini_map) - 1
+    x_max = len(mini_map[0]) - 1
+    while True:
+        y = random.randint(0, y_max)
+        x = random.randint(0, x_max)
+        if mini_map[y][x] != 1:
+            return x, y
+
+
+
+
 class Map:
-    def __init__(self, game):
+    def __init__(self, game, treasure_place=treasure_place()):
         self.game = game
         self.mini_map = mini_map
         self.world_map = {}
         self.get_map()
-        self.x, self.y = self.treasure_place()
+        self.x, self.y = treasure_place
+        self.world_map[(self.x, self.y)] = 2
+
 
     def get_map(self):
         for j, row in enumerate(self.mini_map):
@@ -44,8 +60,6 @@ class Map:
             y = random.randint(0, y_max)
             x = random.randint(0, x_max)
             if self.mini_map[y][x] != 1:
-                self.mini_map[y][x] = 2
-                self.world_map[(x, y)] = 2
                 return x, y
 
 

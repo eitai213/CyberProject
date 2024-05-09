@@ -1,3 +1,5 @@
+import json
+
 from setting import *
 from map import *
 from player import *
@@ -9,25 +11,21 @@ import sys
 
 
 class Game:
-    def __init__(self):
+    def __init__(self, treasure_place=treasure_place(),position=PLAYER_POS, num_player=0, client_socket=None):
         pg.init()
         pg.mouse.set_visible(False)
         self.screen = pg.display.set_mode(RES)
         self.clock = pg.time.Clock()
         self.delta_time = 1
-        self.new_game()
-
-    def new_game(self):
-        self.map = Map(self)
-        self.player = Player(self)
-        self.raycasting = RayCasting(self)
-        self.static_sprite = SpriteObject(self)
+        self.map = Map(self, treasure_place=treasure_place)
+        self.player = Player(self, position=position, num_player=num_player)
+        self.ray_casting = RayCasting(self)
+        self.client_socket = client_socket
 
 
     def update(self):
         self.player.update()
-        self.raycasting.update()
-        self.static_sprite.update()
+        self.ray_casting.update()
         pg.display.flip()
         self.delta_time = self.clock.tick(FPS)
         pg.display.set_caption("Game")
@@ -44,14 +42,17 @@ class Game:
                 pg.quit()
                 sys.exit()
 
+    def send_to_server(self):
+        data = self.player.get_position()
+        self.client_socket.sendall(json.dumps(data).encode())
+
     def run(self):
         while (self.player.check_treasure_collision(self.map.x, self.map.y)):
             self.check_events()
+            self.send_to_server()
             self.update()
             self.draw()
         print("you win!!!!")
 
 
 
-app = Game()
-app.run()
