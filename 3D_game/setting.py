@@ -1,8 +1,14 @@
 import math
+import json
 
 
-SERVER_IP = "127.0.0.1"
-SERVER_PORT = 8820
+config_path = "C:/Cyber_Project/3D_game/config.json"  # או הנתיב המלא של הקובץ
+with open(config_path, "r") as f:
+    config = json.load(f)
+
+
+SERVER_IP = config["server_ip"]
+SERVER_PORT = config["server_port"]
 SOCKET_SIZE = 1024
 
 

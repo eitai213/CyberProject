@@ -42,9 +42,13 @@ class Game:
                 pg.quit()
                 sys.exit()
 
+
     def send_to_server(self):
         data = self.player.get_position()
         self.client_socket.sendall(json.dumps(data).encode())
+
+
+
 
     def run(self):
         while (self.player.check_treasure_collision(self.map.x, self.map.y)):

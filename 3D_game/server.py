@@ -1,42 +1,48 @@
-import json
 import socket
-from setting import *
+import threading
+import json
+import setting as s  # ייבוא הגדרות
 from map import *
 
-
-treasure_place = treasure_place()
+# הגדרת כתובת IP מקומית דינמית
+hostname = socket.gethostname()
+local_ip = socket.gethostbyname(hostname)  # קבלת ה-IP המקומי
+print("Server IP:", local_ip)
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind((SERVER_IP, SERVER_PORT))
-server_socket.listen()
+server_socket.bind((local_ip, s.SERVER_PORT))  # שימוש ב-IP המקומי
+server_socket.listen(5)  # המספר כאן מציין את מספר החיבורים שהשרת יכול להמתין להם
 
 num_player = 0
 data_players = []
+treasure = treasure_place()
 
-print("Waiting for a connection...")
-conn, addr = server_socket.accept()
+print("Waiting for connections...")
 
-new_player = [PLAYER_POS, num_player]
-new_client_data = [new_player, treasure_place]
+# פונקציה לטיפול בכל לקוח בנפרד
+def handle_client(conn, addr):
+    global num_player
+    global data_players
+    global treasure
 
-num_player += 1
-data_players.append(new_player)
+    print(f"Connected by {addr}")
 
-with conn:
-    print('Connected by', addr)
-    # רשימה לשליחה
-    data_to_send = new_client_data
+    new_player = [s.PLAYER_POS, num_player]
+    data_to_send = [new_player, treasure]
 
-    # המרת הרשימה ל-JSON
     json_data = json.dumps(data_to_send)
-
-    # שליחת הנתונים ללקוח
-    conn.sendall(json_data.encode('utf-8'))
+    conn.sendall(json_data.encode("utf-8"))
 
     while True:
-        data = conn.recv(1024)
-        received_message = json.loads(data.decode('utf-8'))
-        print(received_message)
+        data = conn.recv(s.SOCKET_SIZE)
+        if not data:
+            break
 
+        received_message = json.loads(data.decode("utf-8"))
+        print("Received from client:", received_message)
 
+    conn.close()
 
+while True:
+    conn, addr = server_socket.accept()
+    threading.Thread(target=handle_client, args=(conn, addr)).start()
