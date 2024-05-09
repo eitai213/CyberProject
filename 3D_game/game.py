@@ -1,5 +1,4 @@
 import json
-
 from setting import *
 from map import *
 from player import *
@@ -44,10 +43,8 @@ class Game:
 
 
     def send_to_server(self):
-        data = self.player.get_position()
+        data = [self.player.get_position(), self.player.num_player]
         self.client_socket.sendall(json.dumps(data).encode())
-
-
 
 
     def run(self):
