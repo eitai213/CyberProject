@@ -8,6 +8,7 @@ num_player = 0
 data_players = []
 treasure = treasure_place()
 
+
 def update_data_players(current_player, new_data):
     global data_players
     i = 0
@@ -17,16 +18,19 @@ def update_data_players(current_player, new_data):
             break
         i += 1
 
+
 def get_local_ip():
     """פונקציה שמחזירה את כתובת ה-IP הפנימית של המחשב"""
     hostname = socket.gethostname()
     local_ip = socket.gethostbyname(hostname)
     return local_ip
 
+
 # הגדרות השרת
 SERVER_IP = get_local_ip()
 SERVER_PORT = s.SERVER_PORT
 BROADCAST_PORT = 12344  # פורט להאזנה להודעות broadcast
+
 
 def handle_client(client_socket):
     global num_player
@@ -55,6 +59,7 @@ def handle_client(client_socket):
 
     client_socket.close()
 
+
 def broadcast_listener():
     """מאזין להודעות broadcast ושולח חזרה את כתובת ה-IP של השרת"""
     broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -67,6 +72,7 @@ def broadcast_listener():
         if message.decode('utf-8') == "DISCOVER_SERVER":
             response_message = SERVER_IP.encode('utf-8')
             broadcast_socket.sendto(response_message, address)
+
 
 # יצירת סוקט של השרת
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

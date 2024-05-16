@@ -1,12 +1,7 @@
 import math
 import json
 
-config_path = "C:/Cyber_Project/3D_game/config.json"  # או הנתיב המלא של הקובץ
-with open(config_path, "r") as f:
-    config = json.load(f)
-
-SERVER_IP = config["server_ip"]
-SERVER_PORT = config["server_port"]
+SERVER_PORT = 12345
 SOCKET_SIZE = 1024
 
 # הגדרות המשחק
