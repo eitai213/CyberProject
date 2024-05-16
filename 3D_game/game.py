@@ -62,7 +62,7 @@ class Game:
                 self.send_to_server()
                 self.update()
                 self.draw()
-        print("you win!!!!")
+        print("you win!!!!!")
 
 
 
