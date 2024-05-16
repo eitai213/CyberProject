@@ -8,7 +8,6 @@ num_player = 0
 data_players = []
 treasure = treasure_place()
 
-
 def update_data_players(current_player, new_data):
     global data_players
     i = 0
@@ -18,19 +17,14 @@ def update_data_players(current_player, new_data):
             break
         i += 1
 
-
 def get_local_ip():
-    """פונקציה שמחזירה את כתובת ה-IP הפנימית של המחשב"""
     hostname = socket.gethostname()
     local_ip = socket.gethostbyname(hostname)
     return local_ip
 
-
-# הגדרות השרת
 SERVER_IP = get_local_ip()
 SERVER_PORT = s.SERVER_PORT
-BROADCAST_PORT = 12344  # פורט להאזנה להודעות broadcast
-
+BROADCAST_PORT = 12344
 
 def handle_client(client_socket):
     global num_player
@@ -59,9 +53,7 @@ def handle_client(client_socket):
 
     client_socket.close()
 
-
 def broadcast_listener():
-    """מאזין להודעות broadcast ושולח חזרה את כתובת ה-IP של השרת"""
     broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     broadcast_socket.bind(("", BROADCAST_PORT))
@@ -73,17 +65,14 @@ def broadcast_listener():
             response_message = SERVER_IP.encode('utf-8')
             broadcast_socket.sendto(response_message, address)
 
+broadcast_thread = threading.Thread(target=broadcast_listener, daemon=True)
+broadcast_thread.start()
 
-# יצירת סוקט של השרת
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind((SERVER_IP, SERVER_PORT))
 server_socket.listen(5)
 
 print(f"Server listening on {SERVER_IP}:{SERVER_PORT}")
-
-# יצירת תהליך נפרד להאזנה להודעות broadcast
-broadcast_thread = threading.Thread(target=broadcast_listener, daemon=True)
-broadcast_thread.start()
 
 while True:
     client_socket, addr = server_socket.accept()
