@@ -37,10 +37,6 @@ if server_ip:
     num_player = decoded_data[0][1]
     treasure_place = decoded_data[1]
 
-    # שליחת הודעת מבחן לשרת
-    test_message = json.dumps(["test_message", num_player]).encode('utf-8')
-    client_socket.sendall(test_message)
-
     app = game.Game(
         treasure_place=treasure_place,
         position=position_player,

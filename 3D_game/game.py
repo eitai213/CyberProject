@@ -7,8 +7,6 @@ from object_renderer import *
 import pygame as pg
 import sys
 
-
-
 class Game:
     def __init__(self, treasure_place, screen=pg.display.set_mode(RES), position=PLAYER_POS, num_player=0, client_socket=None):
         pg.init()
@@ -19,10 +17,8 @@ class Game:
         self.map = Map(self, treasure_place=treasure_place)
         self.player = Player(self, position=position, num_player=num_player)
         self.object_renderer = ObjectRenderer(self)
-
         self.ray_casting = RayCasting(self)
         self.client_socket = client_socket
-
 
     def update(self):
         self.player.update()
@@ -33,46 +29,45 @@ class Game:
 
     def draw(self):
         if self.client_socket:
-            self.screen.fill('black')
-            self.object_renderer.draw()
-        else:
             data_players = self.get_data_from_server()
             self.map.update_other_player(data_players)
             self.object_renderer.draw()
             self.map.clean_old_position_of_other_player(data_players)
-        # self.map.draw()
-        # self.player.draw()
+        else:
+            self.screen.fill('black')
+            self.object_renderer.draw()
 
 
     def check_events(self):
         for event in pg.event.get():
-            if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.type == pg.K_ESCAPE):
+            if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
                 pg.quit()
                 sys.exit()
 
 
     def send_to_server(self):
         data = [self.player.get_position(), self.player.num_player]
-        self.client_socket.sendall(json.dumps(data).encode())
+        json_data = json.dumps(data)
+        self.client_socket.sendall(json_data.encode("utf-8"))
+        # print(f"Sent data to server: {json_data}")
+
 
     def get_data_from_server(self):
-        received_data = self.client_socket.recv(SOCKET_SIZE)
-        decoded_data = json.loads(received_data.decode("utf-8"))
-        return decoded_data
+        data = self.client_socket.recv(SOCKET_SIZE)
+        received_message = json.loads(data.decode("utf-8"))
+        return received_message
+
 
     def run(self):
         if self.client_socket:
-            while (self.player.check_treasure_collision(self.map.x, self.map.y)):
-                self.check_events()
-                self.update()
-                self.draw()
-        else:
-            while (self.player.check_treasure_collision(self.map.x, self.map.y)):
+            while True:
                 self.check_events()
                 self.send_to_server()
                 self.update()
                 self.draw()
-        print("you win!!!!!")
-
-
+        else:
+            while self.player.check_treasure_collision(self.map.x, self.map.y):
+                self.check_events()
+                self.update()
+                self.draw()
 

@@ -68,6 +68,8 @@ class Map:
         while i < len(data_players):
             if data_players[i][-1] != self.game.player.num_player:
                 self.world_map[(data_players[i][0][0], data_players[i][0][1])] = _
+            i += 1
+
 
 
     def update_other_player(self, data_players):
@@ -75,3 +77,4 @@ class Map:
         while i < len(data_players):
             if data_players[i][-1] != self.game.player.num_player :
                 self.world_map[(data_players[i][0][0], data_players[i][0][1])] = 3
+            i += 1

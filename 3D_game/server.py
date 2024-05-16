@@ -10,12 +10,10 @@ treasure = treasure_place()
 
 def update_data_players(current_player, new_data):
     global data_players
-    i = 0
-    while i < len(data_players):
-        if i == current_player:
+    for i, player_data in enumerate(data_players):
+        if player_data[1] == current_player:
             data_players[i] = new_data
             break
-        i += 1
 
 def get_local_ip():
     hostname = socket.gethostname()
@@ -25,6 +23,8 @@ def get_local_ip():
 SERVER_IP = get_local_ip()
 SERVER_PORT = s.SERVER_PORT
 BROADCAST_PORT = 12344
+
+
 
 def handle_client(client_socket):
     global num_player
@@ -42,18 +42,27 @@ def handle_client(client_socket):
     num_player += 1
     data_players.append(new_player)
 
+    print(data_players)
+
     while True:
         try:
             data = client_socket.recv(s.SOCKET_SIZE)
             if not data:
+                print("No data received, closing connection.")
                 break
 
-            print(f"Received raw data: {data}")
 
-            # דיבאג: נסה להדפיס את הנתונים שקיבלת
             received_message = json.loads(data.decode("utf-8"))
             update_data_players(received_message[1], received_message)
+
+
+            json_data = json.dumps(data_players)
+            client_socket.sendall(json_data.encode('utf-8'))
+
+
+            # Print updated player data
             print(data_players)
+
         except json.JSONDecodeError as e:
             print(f"JSON decode error: {e}")
             continue
@@ -74,7 +83,6 @@ def broadcast_listener():
         if message.decode('utf-8') == "DISCOVER_SERVER":
             response_message = SERVER_IP.encode('utf-8')
             broadcast_socket.sendto(response_message, address)
-
 
 broadcast_thread = threading.Thread(target=broadcast_listener, daemon=True)
 broadcast_thread.start()
