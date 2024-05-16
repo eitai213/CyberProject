@@ -146,7 +146,7 @@ def main_menu():
 
 
 
-loading_screen()
-pygame.time.delay(3000)
+#loading_screen()
+#pygame.time.delay(3000)
 
 main_menu()

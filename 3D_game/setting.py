@@ -1,7 +1,7 @@
 import math
 import json
 
-SERVER_PORT = 12345
+SERVER_PORT = 12335
 SOCKET_SIZE = 1024
 
 # הגדרות המשחק
@@ -33,3 +33,9 @@ MAX_DEPTH = 20
 
 SCREEN_DIST = HALF_WIDTH / math.tan(HALF_FOV)
 SCALE = WIDTH // NUM_RAYS
+
+
+
+
+
+

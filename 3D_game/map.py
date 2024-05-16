@@ -63,5 +63,15 @@ class Map:
                 return x, y
 
 
+    def clean_old_position_of_other_player(self, data_players):
+        i = 0
+        while i < len(data_players):
+            if data_players[i][-1] != self.game.player.num_player:
+                self.world_map[(data_players[i][0][0], data_players[i][0][1])] = _
 
 
+    def update_other_player(self, data_players):
+        i = 0
+        while i < len(data_players):
+            if data_players[i][-1] != self.game.player.num_player :
+                self.world_map[(data_players[i][0][0], data_players[i][0][1])] = 3

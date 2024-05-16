@@ -43,13 +43,23 @@ def handle_client(client_socket):
     data_players.append(new_player)
 
     while True:
-        data = client_socket.recv(s.SOCKET_SIZE)
-        if not data:
-            break
+        try:
+            data = client_socket.recv(s.SOCKET_SIZE)
+            if not data:
+                break
 
-        received_message = json.loads(data.decode("utf-8"))
-        update_data_players(received_message[1], received_message)
-        print(data_players)
+            print(f"Received raw data: {data}")
+
+            # דיבאג: נסה להדפיס את הנתונים שקיבלת
+            received_message = json.loads(data.decode("utf-8"))
+            update_data_players(received_message[1], received_message)
+            print(data_players)
+        except json.JSONDecodeError as e:
+            print(f"JSON decode error: {e}")
+            continue
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            break
 
     client_socket.close()
 
@@ -64,6 +74,7 @@ def broadcast_listener():
         if message.decode('utf-8') == "DISCOVER_SERVER":
             response_message = SERVER_IP.encode('utf-8')
             broadcast_socket.sendto(response_message, address)
+
 
 broadcast_thread = threading.Thread(target=broadcast_listener, daemon=True)
 broadcast_thread.start()

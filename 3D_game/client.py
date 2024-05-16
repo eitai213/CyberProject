@@ -6,7 +6,6 @@ from setting import *
 BROADCAST_PORT = 12344
 SERVER_PORT = SERVER_PORT
 
-
 def discover_server():
     broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -24,7 +23,6 @@ def discover_server():
         print("No response to broadcast, server not found.")
         return None
 
-
 server_ip = discover_server()
 if server_ip:
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -38,6 +36,10 @@ if server_ip:
     position_player = decoded_data[0][0]
     num_player = decoded_data[0][1]
     treasure_place = decoded_data[1]
+
+    # שליחת הודעת מבחן לשרת
+    test_message = json.dumps(["test_message", num_player]).encode('utf-8')
+    client_socket.sendall(test_message)
 
     app = game.Game(
         treasure_place=treasure_place,

@@ -32,10 +32,16 @@ class Game:
         pg.display.set_caption("Game")
 
     def draw(self):
-        self.screen.fill('black')
-        self.object_renderer.draw()
-        #self.map.draw()
-        #self.player.draw()
+        if self.client_socket:
+            self.screen.fill('black')
+            self.object_renderer.draw()
+        else:
+            data_players = self.get_data_from_server()
+            self.map.update_other_player(data_players)
+            self.object_renderer.draw()
+            self.map.clean_old_position_of_other_player(data_players)
+        # self.map.draw()
+        # self.player.draw()
 
 
     def check_events(self):
@@ -49,9 +55,13 @@ class Game:
         data = [self.player.get_position(), self.player.num_player]
         self.client_socket.sendall(json.dumps(data).encode())
 
+    def get_data_from_server(self):
+        received_data = self.client_socket.recv(SOCKET_SIZE)
+        decoded_data = json.loads(received_data.decode("utf-8"))
+        return decoded_data
 
     def run(self):
-        if self.client_socket == None:
+        if self.client_socket:
             while (self.player.check_treasure_collision(self.map.x, self.map.y)):
                 self.check_events()
                 self.update()
