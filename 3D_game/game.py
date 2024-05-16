@@ -3,21 +3,23 @@ from setting import *
 from map import *
 from player import *
 from raycasting import *
-from sprite_object import *
+from object_renderer import *
 import pygame as pg
 import sys
 
 
 
 class Game:
-    def __init__(self, treasure_place=treasure_place(),position=PLAYER_POS, num_player=0, client_socket=None):
+    def __init__(self, treasure_place, screen=pg.display.set_mode(RES), position=PLAYER_POS, num_player=0, client_socket=None):
         pg.init()
         pg.mouse.set_visible(False)
-        self.screen = pg.display.set_mode(RES)
+        self.screen = screen
         self.clock = pg.time.Clock()
         self.delta_time = 1
         self.map = Map(self, treasure_place=treasure_place)
         self.player = Player(self, position=position, num_player=num_player)
+        self.object_renderer = ObjectRenderer(self)
+
         self.ray_casting = RayCasting(self)
         self.client_socket = client_socket
 
@@ -31,6 +33,7 @@ class Game:
 
     def draw(self):
         self.screen.fill('black')
+        self.object_renderer.draw()
         #self.map.draw()
         #self.player.draw()
 
@@ -48,11 +51,17 @@ class Game:
 
 
     def run(self):
-        while (self.player.check_treasure_collision(self.map.x, self.map.y)):
-            self.check_events()
-            self.send_to_server()
-            self.update()
-            self.draw()
+        if self.client_socket == None:
+            while (self.player.check_treasure_collision(self.map.x, self.map.y)):
+                self.check_events()
+                self.update()
+                self.draw()
+        else:
+            while (self.player.check_treasure_collision(self.map.x, self.map.y)):
+                self.check_events()
+                self.send_to_server()
+                self.update()
+                self.draw()
         print("you win!!!!")
 
 
