@@ -2,6 +2,7 @@ import math
 import json
 
 SERVER_PORT = 12335
+BROADCAST_PORT = 12344
 SOCKET_SIZE = 1024
 
 # הגדרות המשחק
@@ -38,4 +39,15 @@ SCALE = WIDTH // NUM_RAYS
 
 
 
+HOW_TO_PLAY_TEXT = """The goal of the game is to find the treasure
+First before everyone else
 
+Movement keys:
+Go ahead: W
+Back: S
+Right: D
+Left: A
+
+And for the range of motion are realized with the mouse
+
+"""

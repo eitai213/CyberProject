@@ -36,7 +36,6 @@ class Map:
         self.x, self.y = treasure_place
         self.world_map[(self.x, self.y)] = 2
 
-
     def get_map(self):
         for j, row in enumerate(self.mini_map):
             for i, value in enumerate(row):
@@ -48,7 +47,6 @@ class Map:
             if self.world_map[pos] == 1:
                 pg.draw.rect(self.game.screen, 'darkgray', (pos[0] * 100, pos[1] * 100, 100, 100), 2)
 
-
         for pos, value in self.world_map.items():
             if value == 2:
                 pg.draw.circle(self.game.screen, 'red', (pos[0] * 100 + 50, pos[1] * 100 + 50), 30)
@@ -59,22 +57,23 @@ class Map:
         while True:
             y = random.randint(0, y_max)
             x = random.randint(0, x_max)
-            if self.mini_map[y][x] != 1:
-                return x, y
-
+            if self.mini_map[y][x] == 0:
+                break
+        return (x, y)
 
     def clean_old_position_of_other_player(self, data_players):
-        i = 0
-        while i < len(data_players):
-            if data_players[i][-1] != self.game.player.num_player:
-                self.world_map[(data_players[i][0][0], data_players[i][0][1])] = _
-            i += 1
+        all_other_players_pos = []
+        for player_data in data_players:
+            if player_data[-1] != self.game.player.num_player:
+                pos = (int(player_data[0][0]), int(player_data[0][1]))
+                all_other_players_pos.append(pos)
 
-
+        for pos in list(self.world_map.keys()):
+            if self.world_map[pos] == 3 and pos not in all_other_players_pos:
+                del self.world_map[pos]
 
     def update_other_player(self, data_players):
-        i = 0
-        while i < len(data_players):
-            if data_players[i][-1] != self.game.player.num_player :
-                self.world_map[(data_players[i][0][0], data_players[i][0][1])] = 3
-            i += 1
+        for player_data in data_players:
+            if player_data[-1] != self.game.player.num_player:
+                pos = (int(player_data[0][0]), int(player_data[0][1]))
+                self.world_map[pos] = 3

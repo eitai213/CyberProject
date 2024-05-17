@@ -23,27 +23,39 @@ def discover_server():
         print("No response to broadcast, server not found.")
         return None
 
-server_ip = discover_server()
-if server_ip:
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((server_ip, SERVER_PORT))
 
-    received_data = client_socket.recv(1024)
-    decoded_data = json.loads(received_data.decode("utf-8"))
 
-    print(decoded_data)
 
-    position_player = decoded_data[0][0]
-    num_player = decoded_data[0][1]
-    treasure_place = decoded_data[1]
+class Client:
+    def __init__(self, name_player="spicy natan", server_ip=discover_server()):
+        self.name_player = name_player
+        self.server_ip = server_ip
 
-    app = game.Game(
-        treasure_place=treasure_place,
-        position=position_player,
-        num_player=num_player,
-        client_socket=client_socket,
-    )
+    def run_client(self):
+        if self.server_ip:
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect((self.server_ip, SERVER_PORT))
 
-    app.run()
-else:
-    print("Failed to discover server.")
+            received_data = client_socket.recv(1024)
+            decoded_data = json.loads(received_data.decode("utf-8"))
+
+            print(decoded_data)
+
+            position_player = decoded_data[0][0]
+            num_player = decoded_data[0][1]
+            treasure_place = decoded_data[1]
+
+            app = game.Game(
+                treasure_place=treasure_place,
+                position=position_player,
+                num_player=num_player,
+                client_socket=client_socket,
+            )
+
+            app.run()
+        else:
+            print("Failed to discover server.")
+
+
+# a = Client("sss")
+# a.run_client()

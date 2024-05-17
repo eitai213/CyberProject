@@ -1,7 +1,6 @@
 import pygame as pg
 from setting import *
 
-
 class ObjectRenderer:
     def __init__(self, game):
         self.game = game
@@ -22,7 +21,6 @@ class ObjectRenderer:
     def game_over(self):
         self.screen.blit(self.game_over_image, (0, 0))
 
-
     def draw_background(self):
         self.sky_offset = (self.sky_offset + 4.5 * self.game.player.rel) % WIDTH
         self.screen.blit(self.sky_image, (-self.sky_offset, 0))
@@ -32,7 +30,7 @@ class ObjectRenderer:
 
     def render_game_objects(self):
         list_objects = self.game.ray_casting.objects_to_render
-        for depth, image, pos in list_objects:
+        for depth, image, pos in sorted(list_objects, key=lambda x: x[0], reverse=True):
             self.screen.blit(image, pos)
 
     @staticmethod
@@ -46,3 +44,4 @@ class ObjectRenderer:
             2: self.get_texture('assets/treasure.png'),
             3: self.get_texture('assets/3.png'),
         }
+    

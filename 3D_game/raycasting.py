@@ -9,7 +9,6 @@ class RayCasting:
         self.ray_casting_result = []
         self.objects_to_render = []
         self.textures = self.game.object_renderer.wall_textures
-        self.treasure_pos = (self.game.map.x, self.game.map.y)
 
     def get_objects_to_render(self):
         self.objects_to_render = []
@@ -35,7 +34,6 @@ class RayCasting:
 
     def ray_cast(self):
         self.ray_casting_result = []
-        texture_vert, texture_hor = 1, 1
         ox, oy = self.game.player.pos
         x_map, y_map = self.game.player.map_pos
 
@@ -104,3 +102,26 @@ class RayCasting:
     def update(self):
         self.ray_cast()
         self.get_objects_to_render()
+
+        # Add player objects to render list
+        self.add_players_to_render()
+
+    def add_players_to_render(self):
+        for pos, value in self.game.map.world_map.items():
+            if value == 3:
+                player_x, player_y = pos
+                dx = player_x - self.game.player.x
+                dy = player_y - self.game.player.y
+                distance = math.sqrt(dx * dx + dy * dy)
+                angle = math.atan2(dy, dx) - self.game.player.angle
+
+                if -HALF_FOV < angle < HALF_FOV:
+                    depth = distance * math.cos(angle)
+                    proj_height = SCREEN_DIST / (depth + 0.0001)
+
+                    if proj_height < HEIGHT:
+                        player_image = self.textures[3]
+                        player_image = pg.transform.scale(player_image, (proj_height, proj_height))
+                        player_pos = (HALF_WIDTH + proj_height * math.tan(angle) - proj_height // 2,
+                                      HALF_HEIGHT - proj_height // 2)
+                        self.objects_to_render.append((depth, player_image, player_pos))

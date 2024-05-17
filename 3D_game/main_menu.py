@@ -1,5 +1,7 @@
 import pygame
 from setting import *
+from server import *
+from  client import *
 from game import *
 import sys
 
@@ -13,6 +15,8 @@ pygame.display.set_caption('Treasure Hunt')
 # הגדרת צבעים
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+
+
 
 
 # פונקציה ליצירת אובייקט טקסט
@@ -82,23 +86,64 @@ def start_single_player_game():
 
 
 def create_server():
-    pass
+    clean_the_window()
+
+    server = Server()
+    client = Client()
+
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        if draw_button(screen, "Start", HALF_WIDTH, HALF_HEIGHT, 400, 50,(255, 255, 0),(0, 255, 0)):
+            server.run_server()
+            client.run_client()
+
+        if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
+            back_button()
+
+        pygame.display.update()
 
 
 def join_to_other_server():
     pass
 
 
+# הגדרת משתנה global לשמירת הטקסט המקולט מהמשתמש
+input_text = ''
+
+# פונקציה לצייר תיבת טקסט ולקבל את הטקסט שהמשתמש מקליד
+def draw_text_input():
+    font = pygame.font.Font(None, 36)
+    text_surface = font.render(input_text, True, BLACK)
+    screen.blit(text_surface, (10, 10))
+
+# לולאת המשחק הראשית של מסך ה-Multiplayer Game
 def start_multiplayer_game():
-    while True :
+    global input_text
 
+    while True:
         pygame.mouse.set_visible(True)
-
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+            # עדכון הטקסט בהתאם למקלדת
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    input_text = input_text[:-1]  # מחיקת תו אחרון
+                else:
+                    input_text += event.unicode  # הוספת תו למשתנה
+
+        draw_text_input()
+
+        # המשך כאן עם הקוד שלך לציור כפתורים נוספים וכו'
+
 
         if draw_button(screen, "create room", HALF_WIDTH + 300, HALF_HEIGHT, 300, 150, (255, 255, 0), (0, 255, 0)):
             create_server()
@@ -135,8 +180,23 @@ def main_menu():
             clean_the_window()
             start_multiplayer_game()
 
-        if draw_button(screen, "setting", HALF_WIDTH, HALF_HEIGHT + 100, 400,50, (255, 255, 50), (0, 200, 0)):
-            pass
+        if draw_button(screen, "How To Play?", HALF_WIDTH, HALF_HEIGHT + 100, 400,50, (255, 255, 50), (0, 200, 0)):
+            clean_the_window()
+            large_text = pygame.font.Font(None, 72)
+            text_surf, text_rect = text_objects(HOW_TO_PLAY_TEXT, large_text)
+            text_rect.center = (HALF_WIDTH, HALF_HEIGHT)
+            while True:
+                screen.blit(text_surf, text_rect)
+                pygame.display.update()
+
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+
+                if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
+                    back_button()
+
 
         if draw_button(screen, "Quit", HALF_WIDTH, HALF_HEIGHT + 200, 400, 50, (255, 255, 0), (200, 0, 0)):
             pygame.quit()
