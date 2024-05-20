@@ -95,5 +95,5 @@ class Server:
             threading.Thread(target=self.handle_client, args=(client_socket,)).start()
 
 
-# a = Server("ddd")
-# a.run_server()
+a = Server("ddd")
+a.run_server()

@@ -39,15 +39,9 @@ SCALE = WIDTH // NUM_RAYS
 
 
 
-HOW_TO_PLAY_TEXT = """The goal of the game is to find the treasure
-First before everyone else
+HOW_TO_PLAY_TEXT = ['The goal of the game is to find the treasure', 'First before everyone else', '  ',
+                    'Movement keys:', 'Forward: W', 'Back: S', 'Right: D', 'Left: A', '  ',
+                    'And for the range of motion are realized with the mouse']
 
-Movement keys:
-Go ahead: W
-Back: S
-Right: D
-Left: A
 
-And for the range of motion are realized with the mouse
 
-"""

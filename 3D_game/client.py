@@ -57,5 +57,5 @@ class Client:
             print("Failed to discover server.")
 
 
-# a = Client("sss")
-# a.run_client()
+a = Client("sss")
+a.run_client()

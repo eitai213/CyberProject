@@ -26,7 +26,7 @@ class ObjectRenderer:
         self.screen.blit(self.sky_image, (-self.sky_offset, 0))
         self.screen.blit(self.sky_image, (-self.sky_offset + WIDTH, 0))
         # floor
-        pg.draw.rect(self.screen, "white", (0, HALF_HEIGHT, WIDTH, HEIGHT))
+        pg.draw.rect(self.screen, FLOOR_COLOR, (0, HALF_HEIGHT, WIDTH, HEIGHT))
 
     def render_game_objects(self):
         list_objects = self.game.ray_casting.objects_to_render
