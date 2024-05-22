@@ -1,5 +1,14 @@
+import pygame
 import pygame as pg
 from setting import *
+
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+
+def text_objects(text, font, color=BLACK):
+    text_surface = font.render(text, True, color)
+    return text_surface, text_surface.get_rect()
+
 
 class ObjectRenderer:
     def __init__(self, game):
@@ -20,6 +29,10 @@ class ObjectRenderer:
 
     def draw_losing_background(self, name_player):
         self.screen.blit(self.losing_image, (0, 0))
+        large_text = pygame.font.Font(None, 40)
+        text_surf, text_rect = text_objects(str(name_player), large_text)
+        text_rect.center = (HALF_WIDTH, HALF_HEIGHT + 100)
+        self.screen.blit(text_surf, text_rect)
 
 
     def draw_background(self):
