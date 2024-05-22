@@ -3,7 +3,7 @@ import socket
 import game
 from setting import *
 
-BROADCAST_PORT = 12344
+BROADCAST_PORT = BROADCAST_PORT
 SERVER_PORT = SERVER_PORT
 
 def discover_server():
@@ -21,18 +21,20 @@ def discover_server():
         return server_ip
     except socket.timeout:
         print("No response to broadcast, server not found.")
-        return None
+        return False
 
 
 
 
 class Client:
-    def __init__(self, name_player="spicy natan", server_ip=discover_server()):
+    def __init__(self, server_ip, name_player="spicy natan"):
         self.name_player = name_player
         self.server_ip = server_ip
 
+
     def run_client(self):
         if self.server_ip:
+
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             client_socket.connect((self.server_ip, SERVER_PORT))
 
@@ -52,10 +54,11 @@ class Client:
                 client_socket=client_socket,
             )
 
+
             app.run()
         else:
             print("Failed to discover server.")
 
 
-a = Client("sss")
-a.run_client()
+# a = Client("sss")
+# a.run_client()

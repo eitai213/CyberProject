@@ -20,8 +20,8 @@ BLACK = (0, 0, 0)
 
 
 # פונקציה ליצירת אובייקט טקסט
-def text_objects(text, font):
-    text_surface = font.render(text, True, BLACK)
+def text_objects(text, font, color=BLACK):
+    text_surface = font.render(text, True, color)
     return text_surface, text_surface.get_rect()
 
 
@@ -90,8 +90,11 @@ def create_server():
     clean_the_window()
 
     server = Server()
-    client = Client()
+    server_thread = threading.Thread(target=server.run_server, daemon=True)
+    server_thread.start()
 
+    client = Client(server_ip=server.get_server_ip())
+    client_connected = False
 
     while True:
         for event in pygame.event.get():
@@ -99,11 +102,11 @@ def create_server():
                 pygame.quit()
                 sys.exit()
 
-        if draw_button(screen, "Start", HALF_WIDTH, HALF_HEIGHT, 400, 50,(255, 255, 0),(0, 255, 0)):
-            server.run_server()
-            client.run_client()
-            main_menu()
-            break
+        if draw_button(screen, "Start", HALF_WIDTH, HALF_HEIGHT, 400, 50, (255, 255, 0), (0, 255, 0)):
+            if not client_connected:
+                client_thread = threading.Thread(target=client.run_client)
+                client_thread.start()
+                client_connected = True
 
         if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
             back_button()
@@ -113,17 +116,24 @@ def create_server():
 
 
 def join_to_other_server():
-    pass
+    client = Client(server_ip=discover_server())
+    if client.run_client():
+        pass
+    else:
+        large_text = pygame.font.Font(None, 30)
+        text_surf, text_rect = text_objects("server not found", large_text, (255, 0, 0))
+        text_rect.center = (HALF_WIDTH - 300, HALF_HEIGHT - 20)
+        screen.blit(text_surf, text_rect)
+        pygame.display.update()
+        start_multiplayer_game()
 
 
 
 # לולאת המשחק הראשית של מסך ה-Multiplayer Game
 def start_multiplayer_game():
     pygame.mouse.set_visible(True)
-    print("ok!!!")
+
     while True:
-
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -136,13 +146,13 @@ def start_multiplayer_game():
 
         if draw_button(screen, "join", HALF_WIDTH - 300, HALF_HEIGHT, 300, 150, (255, 255, 0), (0, 255, 0)):
             join_to_other_server()
-            break
+
 
         if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
             back_button()
             break
 
-        print("not ok")
+
         pygame.display.update()
 
 
@@ -177,22 +187,25 @@ def main_menu():
             main_menu()
             break
 
-        if draw_button(screen, "How To Play?", HALF_WIDTH, HALF_HEIGHT + 100, 400,50, (255, 255, 50), (0, 200, 0)):
+        if draw_button(screen, "How To Play?", HALF_WIDTH, HALF_HEIGHT + 100, 400, 50, (255, 255, 50), (0, 200, 0)):
             clean_the_window()
 
             text_lines = HOW_TO_PLAY_TEXT
-            font = pygame.font.Font(None, 36)
+            font = pygame.font.Font(None, 50)
             # יצירת רשימה לשמירת אובייקטי הטקסט ומיקומם על המסך
-            text_objects = []
 
+            text_objects = []
             for i, line in enumerate(text_lines):
                 text_surface = font.render(line, True, BLACK)
                 text_rect = text_surface.get_rect()
-                text_rect.center = (400, 100 + i * 50)  # העמקת השורה ב-50 פיקסלים בין כל שורה לשורה
+                text_rect.center = (HALF_WIDTH, 100 + i * 50)  # העמקת השורה ב-50 פיקסלים בין כל שורה לשורה
                 text_objects.append((text_surface, text_rect))
 
             while True:
-                pygame.display.update()
+                screen.fill(WHITE)  # נקה את המסך בכל פריים
+
+                for text_surface, text_rect in text_objects:
+                    screen.blit(text_surface, text_rect)  # צייר את הטקסט מחדש בכל פריים
 
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -202,6 +215,8 @@ def main_menu():
                 if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
                     back_button()
                     break
+
+                pygame.display.update()
 
 
         if draw_button(screen, "Quit", HALF_WIDTH, HALF_HEIGHT + 200, 400, 50, (255, 255, 0), (200, 0, 0)):

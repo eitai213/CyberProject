@@ -11,6 +11,23 @@ def get_local_ip():
     return local_ip
 
 
+def check_treasure_collision(player_position, treasure_position):
+    if (player_position[0] >= (treasure_position[0] - 0.15) and player_position[0] <= (treasure_position[0] + 1.15) and
+            player_position[1] >= (treasure_position[1] - 0.15) and player_position[1] <= (treasure_position[1] + 1.15)):
+        return False
+    else:
+        return True
+
+
+def check_treasure(data_players, treasure_position):
+    for i in data_players:
+        player_position = data_players[i][0]
+        if check_treasure_collision(player_position, treasure_position):
+            pass
+        else:
+            return data_players[i]
+    return None
+
 class Server:
     def __init__(self, host_name="spicy natan"):
         self.host_name = host_name
@@ -26,6 +43,9 @@ class Server:
             if player_data[1] == current_player:
                 self.data_players[i] = new_data
                 break
+
+    def get_server_ip(self):
+        return self.SERVER_IP
 
     def handle_client(self, client_socket):
 
@@ -90,10 +110,18 @@ class Server:
 
         print(f"Server listening on {self.SERVER_IP}:{self.SERVER_PORT}")
 
+
         while True:
             client_socket, addr = server_socket.accept()
             threading.Thread(target=self.handle_client, args=(client_socket,)).start()
+            if self.data_players:
+                server_socket.close()
+                print("server closed")
+                break
 
 
-a = Server("ddd")
-a.run_server()
+
+
+
+#a = Server("ddd")
+#a.run_server()
