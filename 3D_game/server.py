@@ -14,18 +14,16 @@ def get_local_ip():
 def check_treasure_collision(player_position, treasure_position):
     if (player_position[0] >= (treasure_position[0] - 0.15) and player_position[0] <= (treasure_position[0] + 1.15) and
             player_position[1] >= (treasure_position[1] - 0.15) and player_position[1] <= (treasure_position[1] + 1.15)):
-        return False
-    else:
         return True
+    else:
+        return False
 
 
 def check_treasure(data_players, treasure_position):
-    for i in data_players:
-        player_position = data_players[i][0]
+    for player_data in data_players:
+        player_position = player_data[0]
         if check_treasure_collision(player_position, treasure_position):
-            pass
-        else:
-            return data_players[i]
+            return player_data[1]
     return None
 
 class Server:
@@ -37,6 +35,7 @@ class Server:
         self.num_player = 0
         self.data_players = []
         self.treasure = treasure_place()
+        self.treasure_found = False
 
     def update_data_players(self, current_player, new_data):
         for i, player_data in enumerate(self.data_players):
@@ -48,7 +47,6 @@ class Server:
         return self.SERVER_IP
 
     def handle_client(self, client_socket):
-
         print(f"Connected by {client_socket.getpeername()}")
 
         new_player = [s.PLAYER_POS, self.num_player]
@@ -72,10 +70,18 @@ class Server:
                 received_message = json.loads(data.decode("utf-8"))
                 self.update_data_players(received_message[1], received_message)
 
-                json_data = json.dumps(self.data_players)
-                client_socket.sendall(json_data.encode('utf-8'))
+                winner = check_treasure(self.data_players, self.treasure)
+                if winner:
+                    self.treasure_found = True
+                    json_data = json.dumps([winner, self.treasure_found])
+                    self.broadcast_to_all_clients(json_data)
+                    break
 
-                # Print updated player data
+                else:
+                    # Send updated player data to all clients
+                    json_data = json.dumps(self.data_players)
+                    self.broadcast_to_all_clients(json_data)
+
                 print(self.data_players)
 
             except json.JSONDecodeError as e:
@@ -86,6 +92,14 @@ class Server:
                 break
 
         client_socket.close()
+
+    def broadcast_to_all_clients(self, message):
+        for player_data in self.data_players:
+            try:
+                client_socket = player_data[2]
+                client_socket.sendall(message.encode('utf-8'))
+            except Exception as e:
+                print(f"Error sending message to client: {e}")
 
     def broadcast_listener(self):
         broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -99,7 +113,6 @@ class Server:
                 response_message = self.SERVER_IP.encode('utf-8')
                 broadcast_socket.sendto(response_message, address)
 
-
     def run_server(self):
         broadcast_thread = threading.Thread(target=self.broadcast_listener, daemon=True)
         broadcast_thread.start()
@@ -110,18 +123,11 @@ class Server:
 
         print(f"Server listening on {self.SERVER_IP}:{self.SERVER_PORT}")
 
-
         while True:
             client_socket, addr = server_socket.accept()
+            self.data_players.append([s.PLAYER_POS, self.num_player, client_socket])
             threading.Thread(target=self.handle_client, args=(client_socket,)).start()
-            if self.data_players:
+            if self.treasure_found:
                 server_socket.close()
                 print("server closed")
                 break
-
-
-
-
-
-#a = Server("ddd")
-#a.run_server()

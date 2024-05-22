@@ -8,18 +8,19 @@ class ObjectRenderer:
         self.wall_textures = self.load_wall_textures()
         self.sky_image = self.get_texture('assets/sky.png', (WIDTH, HALF_HEIGHT))
         self.sky_offset = 0
-        self.game_over_image = self.get_texture('assets/game_over.png', RES)
-        self.win_image = self.get_texture('assets/win.png', RES)
+        self.losing_image = self.get_texture('assets/losing_background.png', RES)
+        self.winner_image = self.get_texture('assets/winner_background.png', RES)
 
     def draw(self):
         self.draw_background()
         self.render_game_objects()
 
-    def win(self):
-        self.screen.blit(self.win_image, (0, 0))
+    def draw_winner_background(self):
+        self.screen.blit(self.winner_image, (0, 0))
 
-    def game_over(self):
-        self.screen.blit(self.game_over_image, (0, 0))
+    def draw_losing_background(self, name_player):
+        self.screen.blit(self.losing_image, (0, 0))
+
 
     def draw_background(self):
         self.sky_offset = (self.sky_offset + 4.5 * self.game.player.rel) % WIDTH

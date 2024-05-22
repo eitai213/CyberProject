@@ -30,6 +30,14 @@ class Game:
     def draw(self):
         if self.client_socket:
             data_players = self.get_data_from_server()
+            if data_players[-1] == True:
+                self.client_socket.close()
+                if data_players[0] == self.player.num_player:
+                    self.object_renderer.draw_winner_background()
+                else:
+                    self.object_renderer.draw_losing_background(data_players[0])
+                pg.display.update()
+
             self.map.update_other_player(data_players)
             self.object_renderer.draw()
             self.map.clean_old_position_of_other_player(data_players)
@@ -70,4 +78,5 @@ class Game:
                 self.check_events()
                 self.update()
                 self.draw()
-
+            self.object_renderer.draw_winner_background()
+            pg.display.update()
