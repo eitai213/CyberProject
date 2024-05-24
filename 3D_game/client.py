@@ -55,7 +55,7 @@ class Client:
 
             app.run()
         else:
-            print("Failed to discover server.")
+            print("Failed to discover server...")
 
 
 if __name__ == "__main__":
