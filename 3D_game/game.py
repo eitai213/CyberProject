@@ -28,19 +28,27 @@ class Game:
         pg.display.set_caption("Game")
 
     def draw(self):
-        if self.client_socket:
-            data_players = self.get_data_from_server()
-            if data_players[-1] == True:
-                self.client_socket.close()
-                if data_players[0] == self.player.num_player:
-                    self.object_renderer.draw_winner_background()
-                else:
-                    self.object_renderer.draw_losing_background(data_players[0])
-                pg.display.update()
+        try:
+            if self.client_socket:
+                data_players = self.get_data_from_server()
+                if data_players[0][0] == 1:
+                    self.client_socket.close()
+                    if data_players[0][1] == self.player.num_player:
+                        self.object_renderer.draw_winner_background()
+                    else:
+                        self.object_renderer.draw_losing_background(data_players[0][1])
+                    pg.display.update()
+                    return
 
-            self.map.update_other_player(data_players)
-            self.object_renderer.draw()
-            self.map.clean_old_position_of_other_player(data_players)
+                data_players = data_players[1:]
+                self.map.update_other_player(data_players)
+                self.object_renderer.draw()
+                self.map.clean_old_position_of_other_player(data_players)
+        except Exception as e:
+            print(f"Error receiving data from server: {e}")
+            self.client_socket.close()
+            return
+
         else:
             self.screen.fill('black')
             self.object_renderer.draw()
@@ -52,13 +60,16 @@ class Game:
                 pg.quit()
                 sys.exit()
 
-
     def send_to_server(self):
-        data = [self.player.get_position(), self.player.num_player]
-        json_data = json.dumps(data)
-        self.client_socket.sendall(json_data.encode("utf-8"))
-        # print(f"Sent data to server: {json_data}")
-
+        if self.client_socket:
+            try:
+                data = [self.player.get_position(), self.player.num_player]
+                json_data = json.dumps(data)
+                self.client_socket.sendall(json_data.encode("utf-8"))
+                # print(f"Sent data to server: {json_data}")
+            except Exception as e:
+                print(f"Error sending data to server: {e}")
+                self.client_socket.close()
 
     def get_data_from_server(self):
         data = self.client_socket.recv(SOCKET_SIZE)

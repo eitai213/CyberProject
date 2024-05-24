@@ -1,6 +1,6 @@
-import json
 import socket
 import game
+import json
 from setting import *
 
 BROADCAST_PORT = BROADCAST_PORT
@@ -23,25 +23,24 @@ def discover_server():
         print("No response to broadcast, server not found.")
         return False
 
-
-
-
 class Client:
     def __init__(self, server_ip, name_player="spicy natan"):
         self.name_player = name_player
         self.server_ip = server_ip
 
-
     def run_client(self):
         if self.server_ip:
-
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             client_socket.connect((self.server_ip, SERVER_PORT))
 
-            received_data = client_socket.recv(1024)
-            decoded_data = json.loads(received_data.decode("utf-8"))
-
-            print(decoded_data)
+            try:
+                received_data = client_socket.recv(1024)
+                decoded_data = json.loads(received_data.decode("utf-8"))
+                print(f"Initial data received from server: {decoded_data}")
+            except Exception as e:
+                print(f"Error receiving initial data from server: {e}")
+                client_socket.close()
+                return
 
             position_player = decoded_data[0][0]
             num_player = decoded_data[0][1]
@@ -54,11 +53,12 @@ class Client:
                 client_socket=client_socket,
             )
 
-
             app.run()
         else:
             print("Failed to discover server.")
 
 
-# a = Client("sss")
-# a.run_client()
+if __name__ == "__main__":
+    server_ip = discover_server()
+    client = Client(server_ip)
+    client.run_client()
