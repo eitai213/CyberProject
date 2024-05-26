@@ -6,6 +6,7 @@ from setting import *
 BROADCAST_PORT = BROADCAST_PORT
 SERVER_PORT = SERVER_PORT
 
+
 def discover_server():
     broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -34,6 +35,13 @@ class Client:
             client_socket.connect((self.server_ip, SERVER_PORT))
 
             try:
+                json_data = json.dumps(self.name_player)
+                client_socket.sendall(json_data.encode("utf-8"))
+
+                received_data = client_socket.recv(1024)
+                name_players = json.loads(received_data.decode("utf-8"))
+                print(name_players)
+
                 received_data = client_socket.recv(1024)
                 decoded_data = json.loads(received_data.decode("utf-8"))
                 print(f"Initial data received from server: {decoded_data}")
@@ -53,7 +61,8 @@ class Client:
                 client_socket=client_socket,
             )
 
-            app.run()
+            if app.run():
+                return False
         else:
             print("Failed to discover server...")
 

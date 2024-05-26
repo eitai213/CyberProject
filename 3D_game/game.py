@@ -38,12 +38,13 @@ class Game:
                     else:
                         self.object_renderer.draw_losing_background(data_players[0][1])
                     pg.display.update()
-                    return
+                    return True
 
                 data_players = data_players[1:]
                 self.map.update_other_player(data_players)
                 self.object_renderer.draw()
                 self.map.clean_old_position_of_other_player(data_players)
+                return False
         except Exception as e:
             print(f"Error receiving data from server: {e}")
             self.client_socket.close()
@@ -83,7 +84,8 @@ class Game:
                 self.check_events()
                 self.send_to_server()
                 self.update()
-                self.draw()
+                if self.draw():
+                    break
         else:
             while self.player.check_treasure_collision(self.map.x, self.map.y):
                 self.check_events()
@@ -91,3 +93,5 @@ class Game:
                 self.draw()
             self.object_renderer.draw_winner_background()
             pg.display.update()
+        print("that work")
+        return False

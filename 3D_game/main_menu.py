@@ -124,11 +124,12 @@ def create_server():
     clean_the_window()
 
     server = Server()
+
     server_thread = threading.Thread(target=server.run_server, daemon=True)
+
     server_thread.start()
 
     client = Client(server_ip=server.get_server_ip())
-    client_connected = False
 
     while True:
         for event in pygame.event.get():
@@ -137,10 +138,10 @@ def create_server():
                 sys.exit()
 
         if draw_button(screen, "Start", HALF_WIDTH, HALF_HEIGHT, 400, 50, (255, 255, 0), (0, 255, 0)):
-            if not client_connected:
-                client_thread = threading.Thread(target=client.run_client)
-                client_thread.start()
-                client_connected = True
+            server.start = 1
+            client.run_client()
+
+            break
 
         if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
             back_button()
@@ -150,20 +151,18 @@ def create_server():
 
 
 def join_to_other_server(ip_server, name_player):
+    clean_the_window()
+    if ip_server:
+        pass
+    else:
+        ip_server = discover_server()
+
+    draw_text("waiting for the host,", HALF_WIDTH, HALF_HEIGHT, 50)
+    draw_text("to start the match", HALF_WIDTH, HALF_HEIGHT - 50, 50)
+
     client = Client(server_ip=ip_server, name_player=name_player)
     if client.run_client():
-        while True:
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-
-            if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
-                back_button()
-                break
-            pg.display.update()
-
+        return
     else:
         large_text = pygame.font.Font(None, 30)
         text_surf, text_rect = text_objects("server not found", large_text, (255, 0, 0))
@@ -171,6 +170,8 @@ def join_to_other_server(ip_server, name_player):
         screen.blit(text_surf, text_rect)
         pygame.display.update()
         start_multiplayer_game()
+
+
 
 
 
@@ -220,11 +221,33 @@ def start_multiplayer_game():
 
         if draw_button(screen, "create room", HALF_WIDTH + 300, HALF_HEIGHT, 300, 150, (255, 255, 0), (0, 255, 0)):
             create_server()
-            break
+            pygame.mouse.set_visible(True)
+            while True:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+
+                if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
+                    back_button()
+                    break
+
+                pygame.display.update()
 
         if draw_button(screen, "join", HALF_WIDTH - 300, HALF_HEIGHT, 300, 150, (255, 255, 0), (0, 255, 0)):
             join_to_other_server(ip_server=ip_server, name_player=name_player)
+            pygame.mouse.set_visible(True)
+            while True:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
 
+                if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
+                    back_button()
+                    break
+
+                pygame.display.update()
 
         if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
             back_button()

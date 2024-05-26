@@ -1,7 +1,8 @@
 import socket
 import threading
 import json
-import struct
+import time
+
 import setting as s
 from map import treasure_place
 
@@ -36,7 +37,8 @@ class Server:
         self.treasure = treasure_place()
         self.treasure_found = 0
         self.data_players = [[self.treasure_found, self.winner]]
-
+        self.start = 0
+        self.name_players = []
 
     def update_data_players(self, current_player, new_data):
         self.data_players[current_player + 1] = new_data
@@ -44,7 +46,20 @@ class Server:
     def get_server_ip(self):
         return self.SERVER_IP
 
-    def handle_client(self, client_socket):
+    def waiting_room(self, client_socket, server_socket):
+        data = client_socket.recv(s.SOCKET_SIZE)
+        received_message = json.loads(data.decode("utf-8"))
+        self.name_players.append(received_message)
+
+        while True:
+            if self.start == 1:
+                json_data = json.dumps(self.name_players)
+                client_socket.sendall(json_data.encode("utf-8"))
+                break
+        self.handle_client(client_socket, server_socket)
+
+
+    def handle_client(self, client_socket, server_socket):
         print(f"Connected by {client_socket.getpeername()}")
 
         new_player = [s.PLAYER_POS, self.num_player]
@@ -68,20 +83,23 @@ class Server:
             try:
                 data = client_socket.recv(s.SOCKET_SIZE)
                 if not data:
+                    client_socket.close()
+                    server_socket.close()
                     print("No data received, closing connection.")
                     break
 
                 received_message = json.loads(data.decode("utf-8"))
-                # print(f"Data received from client: {received_message}")
+                print(f"Data received from client: {received_message}")
                 self.update_data_players(received_message[1], received_message)
                 winner = check_treasure(self.data_players[1:], self.treasure)
                 print(winner)
                 if winner != None:
-                    self.treasure_found = 1
+                    self.treasure_found += 1
                     self.data_players[0] = [self.treasure_found, winner]
                     json_data = json.dumps(self.data_players)
                     client_socket.sendall(json_data.encode("utf-8"))
-                    break
+                    if self.treasure_found > 1:
+                        break
                 else:
                     json_data = json.dumps(self.data_players)
                     client_socket.sendall(json_data.encode("utf-8"))
@@ -123,7 +141,7 @@ class Server:
 
         while True:
             client_socket, addr = server_socket.accept()
-            threading.Thread(target=self.handle_client, args=(client_socket,)).start()
+            threading.Thread(target=self.waiting_room, args=(client_socket, server_socket)).start()
             if self.treasure_found:
                 server_socket.close()
                 print("Server closed")
