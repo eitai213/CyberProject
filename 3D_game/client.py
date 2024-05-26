@@ -62,7 +62,7 @@ class Client:
             )
 
             if app.run():
-                return False
+                return True
         else:
             print("Failed to discover server...")
 

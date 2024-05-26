@@ -157,13 +157,15 @@ def join_to_other_server(ip_server, name_player):
     else:
         ip_server = discover_server()
 
-    draw_text("waiting for the host,", HALF_WIDTH, HALF_HEIGHT, 50)
-    draw_text("to start the match", HALF_WIDTH, HALF_HEIGHT - 50, 50)
+    draw_text("waiting for the host,", HALF_WIDTH, HALF_HEIGHT - 50, 50)
+    draw_text("to start the match", HALF_WIDTH, HALF_HEIGHT, 50)
+    pygame.display.update()
 
     client = Client(server_ip=ip_server, name_player=name_player)
     if client.run_client():
         return
     else:
+        clean_the_window()
         large_text = pygame.font.Font(None, 30)
         text_surf, text_rect = text_objects("server not found", large_text, (255, 0, 0))
         text_rect.center = (HALF_WIDTH - 300, HALF_HEIGHT - 20)

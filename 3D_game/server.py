@@ -98,11 +98,10 @@ class Server:
                     self.data_players[0] = [self.treasure_found, winner]
                     json_data = json.dumps(self.data_players)
                     client_socket.sendall(json_data.encode("utf-8"))
-                    if self.treasure_found > 1:
-                        break
-                else:
-                    json_data = json.dumps(self.data_players)
-                    client_socket.sendall(json_data.encode("utf-8"))
+                    break
+
+                json_data = json.dumps(self.data_players)
+                client_socket.sendall(json_data.encode("utf-8"))
 
                 print(f"Updated data players: {self.data_players}")
 

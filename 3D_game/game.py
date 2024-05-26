@@ -94,4 +94,4 @@ class Game:
             self.object_renderer.draw_winner_background()
             pg.display.update()
         print("that work")
-        return False
+        return True
