@@ -120,7 +120,7 @@ def start_single_player_game():
 
 
 
-def create_server():
+def create_server(name_player):
     clean_the_window()
 
     server = Server()
@@ -129,7 +129,9 @@ def create_server():
 
     server_thread.start()
 
-    client = Client(server_ip=server.get_server_ip())
+    draw_text(f"Server IP : {server.get_server_ip()}", HALF_WIDTH - 50, HALF_HEIGHT - 300, 80)
+
+    client = Client(server_ip=server.get_server_ip(), name_player=name_player)
 
     while True:
         for event in pygame.event.get():
@@ -222,7 +224,7 @@ def start_multiplayer_game():
 
 
         if draw_button(screen, "create room", HALF_WIDTH + 300, HALF_HEIGHT, 300, 150, (255, 255, 0), (0, 255, 0)):
-            create_server()
+            create_server(name_player)
             pygame.mouse.set_visible(True)
             while True:
                 for event in pygame.event.get():

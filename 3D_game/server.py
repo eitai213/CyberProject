@@ -1,3 +1,4 @@
+import secure
 import socket
 import threading
 import json
@@ -32,12 +33,13 @@ class Server:
         self.SERVER_IP = get_local_ip()
         self.SERVER_PORT = s.SERVER_PORT
         self.BROADCAST_PORT = s.BROADCAST_PORT
+        self.private_key, self.public_key = secure.generate_keys_for_rsa()
         self.num_player = 0
         self.winner = 0
         self.treasure = treasure_place()
         self.treasure_found = 0
         self.data_players = [[self.treasure_found, self.winner]]
-        self.start = 0
+        self.start = 1
         self.name_players = []
 
     def update_data_players(self, current_player, new_data):
@@ -46,20 +48,38 @@ class Server:
     def get_server_ip(self):
         return self.SERVER_IP
 
-    def waiting_room(self, client_socket, server_socket):
+    def replace_keys(self, client_socket):
+        send_public_key = json.dumps(self.public_key.save_pkcs1().decode('utf-8'))
+        client_socket.sendall(send_public_key.encode("utf-8"))
         data = client_socket.recv(s.SOCKET_SIZE)
-        received_message = json.loads(data.decode("utf-8"))
-        self.name_players.append(received_message)
+        print(f"Received encrypted AES key: {data}")  # Debugging line
+        encrypted_aes_key_hex = json.loads(data.decode("utf-8"))
+        encrypted_aes_key = bytes.fromhex(encrypted_aes_key_hex)
+        client_aes_key = secure.decrypt_key(self.private_key, encrypted_aes_key)
+        print(f"client_aes_key (server){client_aes_key}")
+        return client_aes_key
+
+    def send_message(self, client_socket, client_aes_key, data):
+        encrypted_data = secure.encrypt_message(client_aes_key, json.dumps(data))
+        client_socket.sendall(encrypted_data)
+
+    def recv_message(self, client_socket, client_aes_key):
+        data = client_socket.recv(s.SOCKET_SIZE)
+        return json.loads(secure.decrypt_message(client_aes_key, data))
+
+    def waiting_room(self, client_socket, server_socket):
+        client_aes_key = self.replace_keys(client_socket)
+
+        name_player = self.recv_message(client_socket, client_aes_key)
+        self.name_players.append(name_player)
 
         while True:
             if self.start == 1:
-                json_data = json.dumps(self.name_players)
-                client_socket.sendall(json_data.encode("utf-8"))
+                self.send_message(client_socket, client_aes_key, self.name_players)
                 break
-        self.handle_client(client_socket, server_socket)
+        self.handle_client(client_socket, client_aes_key, server_socket)
 
-
-    def handle_client(self, client_socket, server_socket):
+    def handle_client(self, client_socket, client_aes_key, server_socket):
         print(f"Connected by {client_socket.getpeername()}")
 
         new_player = [s.PLAYER_POS, self.num_player]
@@ -68,8 +88,7 @@ class Server:
 
         try:
             data_to_send = [new_player, self.treasure]
-            json_data = json.dumps(data_to_send)
-            client_socket.sendall(json_data.encode("utf-8"))
+            self.send_message(client_socket, client_aes_key, data_to_send)
             print(f"Initial data sent to client: {data_to_send}")
         except Exception as e:
             print(f"Error sending initial data to client: {e}")
@@ -83,25 +102,21 @@ class Server:
             try:
                 data = client_socket.recv(s.SOCKET_SIZE)
                 if not data:
-                    client_socket.close()
-                    server_socket.close()
                     print("No data received, closing connection.")
                     break
 
-                received_message = json.loads(data.decode("utf-8"))
+                received_message = self.recv_message(client_socket, client_aes_key)
                 print(f"Data received from client: {received_message}")
                 self.update_data_players(received_message[1], received_message)
                 winner = check_treasure(self.data_players[1:], self.treasure)
                 print(winner)
-                if winner != None:
+                if winner is not None:
                     self.treasure_found += 1
-                    self.data_players[0] = [self.treasure_found, winner]
-                    json_data = json.dumps(self.data_players)
-                    client_socket.sendall(json_data.encode("utf-8"))
+                    self.data_players[0] = [self.treasure_found, [winner, self.name_players[winner]]]
+                    self.send_message(client_socket, client_aes_key, self.data_players)
                     break
 
-                json_data = json.dumps(self.data_players)
-                client_socket.sendall(json_data.encode("utf-8"))
+                self.send_message(client_socket, client_aes_key, self.data_players)
 
                 print(f"Updated data players: {self.data_players}")
 
@@ -114,7 +129,6 @@ class Server:
 
         self.data_players.remove(self.data_players[new_player[1] + 1])
         client_socket.close()
-
 
     def broadcast_listener(self):
         broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -139,11 +153,14 @@ class Server:
         print(f"Server listening on {self.SERVER_IP}:{self.SERVER_PORT}")
 
         while True:
-            client_socket, addr = server_socket.accept()
-            threading.Thread(target=self.waiting_room, args=(client_socket, server_socket)).start()
-            if self.treasure_found:
-                server_socket.close()
-                print("Server closed")
+            try:
+                client_socket, addr = server_socket.accept()
+                threading.Thread(target=self.waiting_room, args=(client_socket, server_socket)).start()
+            except OSError as e:
+                print(f"Server socket error: {e}")
+                break
+            except Exception as e:
+                print(f"Unexpected error: {e}")
                 break
 
 if __name__ == "__main__":
