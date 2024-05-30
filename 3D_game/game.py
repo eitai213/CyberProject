@@ -23,18 +23,20 @@ class Game:
         if self.client_socket:
             self.client_aes_key = client_aes_key
 
-
     def update(self):
         self.player.update()
         self.ray_casting.update()
         pg.display.flip()
         self.delta_time = self.clock.tick(FPS)
-        pg.display.set_caption("Game")
+        pg.display.set_caption("Treasure Hunt Game")
 
     def draw(self):
         try:
             if self.client_socket:
                 data_players = self.get_data_from_server()
+
+                self.player.num_player = data_players[self.player.num_player + 1][1]
+
                 print(f"client get data_players : {data_players}")
                 if data_players[0][0] == 1:
                     self.client_socket.close()
@@ -59,7 +61,6 @@ class Game:
             self.screen.fill('black')
             self.object_renderer.draw()
 
-
     def check_events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
@@ -73,15 +74,17 @@ class Game:
                 print(f"send to server : {data}")
                 encrypted_data = secure.encrypt_message(self.client_aes_key, json.dumps(data))
                 self.client_socket.sendall(encrypted_data)
-                # print(f"Sent data to server: {json_data}")
             except Exception as e:
                 print(f"Error sending data to server: {e}")
                 self.client_socket.close()
 
     def get_data_from_server(self):
-        data = self.client_socket.recv(SOCKET_SIZE)
-        return json.loads(secure.decrypt_message(self.client_aes_key, data))
-
+        try:
+            data = self.client_socket.recv(SOCKET_SIZE)
+            return json.loads(secure.decrypt_message(self.client_aes_key, data))
+        except Exception as e:
+            print(f"Error getting data from server: {e}")
+            raise
 
     def run(self):
         if self.client_socket:
@@ -98,5 +101,5 @@ class Game:
                 self.draw()
             self.object_renderer.draw_winner_background()
             pg.display.update()
-        print("that work")
+        print("that work!")
         return True

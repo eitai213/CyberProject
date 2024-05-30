@@ -56,6 +56,6 @@ class ObjectRenderer:
         return {
             1: self.get_texture('assets/1.png'),
             2: self.get_texture('assets/treasure.png'),
-            3: self.get_texture('assets/3.png'),
+            3: self.get_texture('assets/other_player.png'),
         }
     
