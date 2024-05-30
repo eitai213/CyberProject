@@ -15,6 +15,7 @@ mini_map = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 
 
 
+
 def treasure_place():
     y_max = len(mini_map) - 1
     x_max = len(mini_map[0]) - 1
@@ -51,15 +52,6 @@ class Map:
             if value == 2:
                 pg.draw.circle(self.game.screen, 'red', (pos[0] * 100 + 50, pos[1] * 100 + 50), 30)
 
-    def treasure_place(self):
-        y_max = len(self.mini_map) - 1
-        x_max = len(self.mini_map[0]) - 1
-        while True:
-            y = random.randint(0, y_max)
-            x = random.randint(0, x_max)
-            if self.mini_map[y][x] == 0:
-                break
-        return (x, y)
 
     def clean_old_position_of_other_player(self, data_players):
         all_other_players_pos = []

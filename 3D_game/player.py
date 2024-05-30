@@ -56,7 +56,8 @@ class Player:
 
 
     def check_treasure_collision(self, x, y):
-        if self.x >= (x - 0.15) and self.x <= (x + 1.15) and self.y >= (y - 0.15) and self.y <= (y + 1.15):
+        if ((x - 0.15) <= self.x <= (x + 1.15) and
+                (y - 0.15) <= self.y <= (y + 1.15)):
             return False
         else:
             return True

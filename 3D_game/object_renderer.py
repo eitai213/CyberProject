@@ -52,6 +52,11 @@ class ObjectRenderer:
         texture = pg.image.load(path).convert_alpha()
         return pg.transform.scale(texture, res)
 
+    @staticmethod
+    def text_objects(text, font, color=BLACK):
+        text_surface = font.render(text, True, color)
+        return text_surface, text_surface.get_rect()
+
     def load_wall_textures(self):
         return {
             1: self.get_texture('assets/1.png'),

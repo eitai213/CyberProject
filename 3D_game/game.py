@@ -71,7 +71,7 @@ class Game:
         if self.client_socket:
             try:
                 data = [self.player.get_position(), self.player.num_player]
-                print(f"send to server : {data}")
+                # print(f"send to server : {data}") # for debug
                 encrypted_data = secure.encrypt_message(self.client_aes_key, json.dumps(data))
                 self.client_socket.sendall(encrypted_data)
             except Exception as e:

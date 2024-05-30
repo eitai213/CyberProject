@@ -140,6 +140,7 @@ class Server:
                     self.treasure_found += 1
                     self.data_players[0] = [self.treasure_found, [winner, self.name_players[winner]]]
                     self.send_message(client_socket, client_aes_key, self.data_players)
+
                     break
 
                 self.send_message(client_socket, client_aes_key, self.data_players)
@@ -156,6 +157,7 @@ class Server:
         self.data_players.remove(self.data_players[new_player[1] + 1])
         self.update_data_players_after_remove(new_player[1])
         client_socket.close()
+        server_socket.close()
 
     def broadcast_listener(self):
         try:
@@ -192,7 +194,7 @@ class Server:
             except Exception as e:
                 print(f"Unexpected error: {e}")
                 break
-            if self.treasure_found == 1:
+            if self.treasure_found == 2:
                 server_socket.close()
                 client_socket.close()
                 break

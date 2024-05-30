@@ -8,6 +8,7 @@ from setting import *
 BROADCAST_PORT = BROADCAST_PORT
 SERVER_PORT = SERVER_PORT
 
+
 def discover_server():
     broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -30,6 +31,7 @@ class Client:
         self.name_player = name_player
         self.server_ip = server_ip
         self.aes_key = secure.create_aes_key()
+
 
     def run_client(self):
         if self.server_ip:
