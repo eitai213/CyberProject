@@ -79,8 +79,6 @@ def draw_button(screen, text, x, y, width_button, height_button, ic, ac, text_si
     text_surf, text_rect = text_objects(text, small_text)
     text_rect.center = (x, (y + (height_button / 2)))
     screen.blit(text_surf, text_rect)
-
-
     return False
 
 
@@ -97,15 +95,15 @@ def loading_screen():
 
 
 
-background = pygame.image.load('assets/background_Treasure_Hunt.png')
-background = pygame.transform.scale(background, RES)
-def draw_background():
-    global background
+
+def draw_background(path):
+    image = pygame.image.load(path)
+    background = pygame.transform.scale(image, RES)
     screen.blit(background, (0, 0))
 
 
 def clean_the_window():
-    screen.fill(WHITE)
+    draw_background("assets/Normal_background.png")
     pygame.display.update()
 
 
@@ -113,6 +111,11 @@ def back_button():
     clean_the_window()
     main_menu()
 
+def check_events():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
 
 def start_single_player_game():
     a = Game(screen=screen, treasure_place=treasure_place())
@@ -134,10 +137,8 @@ def create_server(name_player):
     client = Client(server_ip=server.get_server_ip(), name_player=name_player)
 
     while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+
+        check_events()
 
         if draw_button(screen, "Start", HALF_WIDTH, HALF_HEIGHT, 400, 50, (255, 255, 0), (0, 255, 0)):
             server.start = 1
@@ -159,6 +160,7 @@ def join_to_other_server(ip_server, name_player):
     else:
         ip_server = discover_server()
 
+    draw_background("assets/Normal_background.png")
     draw_text("waiting for the host,", HALF_WIDTH, HALF_HEIGHT - 50, 50)
     draw_text("to start the match", HALF_WIDTH, HALF_HEIGHT, 50)
     pygame.display.update()
@@ -198,6 +200,7 @@ def start_multiplayer_game():
 
 
     while True:
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -218,8 +221,11 @@ def start_multiplayer_game():
                             active_box = None
                         elif event.key == pygame.K_BACKSPACE:
                             box['text'] = box['text'][:-1]
-                            pygame.draw.rect(screen, WHITE, (box['rect']))
-                        else:
+                            draw_background("assets/Normal_background.png")
+                            draw_text("input your name:", HALF_WIDTH, 35, 36)
+                            draw_text("input the IP server:", HALF_WIDTH - 300, HALF_HEIGHT - 100, 36)
+
+                        else :
                             box['text'] += event.unicode
 
 
@@ -242,10 +248,8 @@ def start_multiplayer_game():
             join_to_other_server(ip_server=ip_server, name_player=name_player)
             pygame.mouse.set_visible(True)
             while True:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        sys.exit()
+
+                check_events()
 
                 if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
                     back_button()
@@ -271,14 +275,9 @@ def main_menu():
 
     while True:
 
-        draw_background()
+        draw_background("assets/background_Treasure_Hunt.png")
 
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
+        check_events()
 
         if draw_button(screen, "Single Player Game", HALF_WIDTH, HALF_HEIGHT - 100, 400, 50, (255, 255, 0), (0, 200, 0)):
             clean_the_window()
@@ -286,10 +285,7 @@ def main_menu():
             pygame.mouse.set_visible(True)
             while True:
 
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        sys.exit()
+                check_events()
 
                 if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
                     back_button()
@@ -304,7 +300,7 @@ def main_menu():
             main_menu()
             break
 
-        if draw_button(screen, "How To Play?", HALF_WIDTH, HALF_HEIGHT + 100, 400, 50, (255, 255, 50), (0, 200, 0)):
+        if draw_button(screen, "How To Play?", HALF_WIDTH, HALF_HEIGHT + 100, 400, 50, (255, 255, 0), (0, 200, 0)):
             clean_the_window()
 
             text_lines = HOW_TO_PLAY_TEXT
@@ -319,15 +315,11 @@ def main_menu():
                 text_objects.append((text_surface, text_rect))
 
             while True:
-                screen.fill(WHITE)  # נקה את המסך בכל פריים
 
                 for text_surface, text_rect in text_objects:
                     screen.blit(text_surface, text_rect)  # צייר את הטקסט מחדש בכל פריים
 
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        sys.exit()
+                check_events()
 
                 if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
                     back_button()
@@ -346,7 +338,6 @@ def main_menu():
 
 
 loading_screen()
-
 
 pygame.time.delay(3000)
 

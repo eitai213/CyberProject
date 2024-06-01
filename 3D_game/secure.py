@@ -38,7 +38,7 @@ def decrypt_message(key, encrypted_message):
     return data.decode()
 
 def create_aes_key():
-    key = os.urandom(32)  # 256-bit key
+    key = os.urandom(32)
     return key
 
 

@@ -8,7 +8,6 @@ from setting import *
 BROADCAST_PORT = BROADCAST_PORT
 SERVER_PORT = SERVER_PORT
 
-
 def discover_server():
     broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -32,7 +31,6 @@ class Client:
         self.server_ip = server_ip
         self.aes_key = secure.create_aes_key()
 
-
     def run_client(self):
         if self.server_ip:
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -52,10 +50,6 @@ class Client:
 
                 encrypted_name_player = secure.encrypt_message(self.aes_key, json.dumps(self.name_player))
                 client_socket.sendall(encrypted_name_player)
-
-                received_data = client_socket.recv(SOCKET_SIZE)
-                name_players = json.loads(secure.decrypt_message(self.aes_key, received_data))
-                print(name_players)
 
                 received_data = client_socket.recv(SOCKET_SIZE)
                 decoded_data = json.loads(secure.decrypt_message(self.aes_key, received_data))

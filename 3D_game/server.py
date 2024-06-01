@@ -12,8 +12,8 @@ def get_local_ip():
     return local_ip
 
 def check_treasure_collision(player_position, treasure_position):
-    if (player_position[0] >= (treasure_position[0] - 0.15) and player_position[0] <= (treasure_position[0] + 1.15) and
-            player_position[1] >= (treasure_position[1] - 0.15) and player_position[1] <= (treasure_position[1] + 1.15)):
+    if ((treasure_position[0] - 0.15) <= player_position[0] <= (treasure_position[0] + 1.15) and
+            (treasure_position[1] - 0.15) <= player_position[1] <= (treasure_position[1] + 1.15)):
         return False
     else:
         return True
@@ -27,8 +27,7 @@ def check_treasure(data_players, treasure_position):
     return None
 
 class Server:
-    def __init__(self, host_name="spicy natan"):
-        self.host_name = host_name
+    def __init__(self):
         self.SERVER_IP = get_local_ip()
         self.SERVER_PORT = s.SERVER_PORT
         self.BROADCAST_PORT = s.BROADCAST_PORT
@@ -38,7 +37,7 @@ class Server:
         self.treasure = treasure_place()
         self.treasure_found = 0
         self.data_players = [[self.treasure_found, self.winner]]
-        self.start = 0
+        self.start = 1
         self.name_players = []
 
 
@@ -47,7 +46,7 @@ class Server:
 
     def update_data_players_after_remove(self, num_player):
         i = num_player
-        while i < num_player:
+        while i < len(self.data_players):
             self.data_players[i][1] = i
             i += 1
 
@@ -69,8 +68,8 @@ class Server:
             print(f"Error in replace_keys: {e}")
             raise
 
-
-    def send_message(self, client_socket, client_aes_key, data):
+    @staticmethod
+    def send_message(client_socket, client_aes_key, data):
         try:
             encrypted_data = secure.encrypt_message(client_aes_key, json.dumps(data))
             client_socket.sendall(encrypted_data)
@@ -78,8 +77,8 @@ class Server:
             print(f"Error in send_message: {e}")
             raise
 
-
-    def recv_message(self, client_socket, client_aes_key):
+    @staticmethod
+    def recv_message(client_socket, client_aes_key):
         try:
             data = client_socket.recv(s.SOCKET_SIZE)
             decode_data = json.loads(secure.decrypt_message(client_aes_key, data))
@@ -93,12 +92,8 @@ class Server:
     def waiting_room(self, client_socket, server_socket):
         try:
             client_aes_key = self.replace_keys(client_socket)
-            name_player = self.recv_message(client_socket, client_aes_key)
-            self.name_players.append(name_player)
-
             while True:
                 if self.start == 1:
-                    self.send_message(client_socket, client_aes_key, self.name_players)
                     break
             self.handle_client(client_socket, client_aes_key, server_socket)
         except Exception as e:
@@ -113,12 +108,16 @@ class Server:
         self.data_players.append(new_player)
 
         try:
+            name_player = self.recv_message(client_socket, client_aes_key)
+            self.name_players.append(name_player)
+
             data_to_send = [new_player, self.treasure]
             self.send_message(client_socket, client_aes_key, data_to_send)
             print(f"Initial data sent to client : {data_to_send}")
         except Exception as e:
             print(f"Error sending initial data to client : {e}")
             self.data_players.remove(new_player)
+            self.update_data_players_after_remove(new_player[1])
             client_socket.close()
             return
 
@@ -149,12 +148,13 @@ class Server:
 
             except json.JSONDecodeError as e:
                 print(f"JSON decode error: {e}")
-                continue
+                break
             except Exception as e:
                 print(f"Unexpected error: {e}")
                 break
 
         self.data_players.remove(self.data_players[new_player[1] + 1])
+        self.num_player -= 1
         self.update_data_players_after_remove(new_player[1])
         client_socket.close()
         server_socket.close()
@@ -194,7 +194,7 @@ class Server:
             except Exception as e:
                 print(f"Unexpected error: {e}")
                 break
-            if self.treasure_found == 2:
+            if self.treasure_found == 1:
                 server_socket.close()
                 client_socket.close()
                 break
