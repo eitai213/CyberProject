@@ -38,7 +38,7 @@ class Game:
                 self.player.num_player = data_players[self.player.num_player + 1][1]
 
                 print(f"client get data_players : {data_players}")
-                if data_players[0][0] == 1:
+                if data_players[0][0] >= 1:
                     self.client_socket.close()
                     if data_players[0][1][0] == self.player.num_player:
                         self.object_renderer.draw_winner_background()

@@ -125,25 +125,17 @@ def start_single_player_game():
 
 def create_server(name_player):
     clean_the_window()
-
     server = Server()
-
     server_thread = threading.Thread(target=server.run_server, daemon=True)
-
     server_thread.start()
-
     draw_text(f"Server IP : {server.get_server_ip()}", HALF_WIDTH - 50, HALF_HEIGHT - 300, 80)
-
     client = Client(server_ip=server.get_server_ip(), name_player=name_player)
 
     while True:
-
         check_events()
-
         if draw_button(screen, "Start", HALF_WIDTH, HALF_HEIGHT, 400, 50, (255, 255, 0), (0, 255, 0)):
             server.start = 1
             client.run_client()
-
             break
 
         if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
@@ -159,8 +151,6 @@ def join_to_other_server(ip_server, name_player):
         pass
     else:
         ip_server = discover_server()
-
-    draw_background("assets/Normal_background.png")
     draw_text("waiting for the host,", HALF_WIDTH, HALF_HEIGHT - 50, 50)
     draw_text("to start the match", HALF_WIDTH, HALF_HEIGHT, 50)
     pygame.display.update()
@@ -185,22 +175,17 @@ def join_to_other_server(ip_server, name_player):
 def start_multiplayer_game():
     global active_box
     global text_boxes
-
     pygame.mouse.set_visible(True)
 
     create_text_box(HALF_WIDTH - 100, 50)
     create_text_box(HALF_WIDTH - 400, HALF_HEIGHT - 80)
-
 
     draw_text("input your name:", HALF_WIDTH, 35, 36)
     draw_text("input the IP server:", HALF_WIDTH - 300, HALF_HEIGHT - 100, 36)
 
     name_player = text_boxes[0]['text']
     ip_server = text_boxes[1]['text']
-
-
     while True:
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -228,33 +213,25 @@ def start_multiplayer_game():
                         else :
                             box['text'] += event.unicode
 
-
         if draw_button(screen, "create room", HALF_WIDTH + 300, HALF_HEIGHT, 300, 150, (255, 255, 0), (0, 255, 0)):
             create_server(name_player)
             pygame.mouse.set_visible(True)
             while True:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        sys.exit()
+                check_events()
 
                 if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
                     back_button()
                     break
-
                 pygame.display.update()
 
         if draw_button(screen, "join", HALF_WIDTH - 300, HALF_HEIGHT, 300, 150, (255, 255, 0), (0, 255, 0)):
             join_to_other_server(ip_server=ip_server, name_player=name_player)
             pygame.mouse.set_visible(True)
             while True:
-
                 check_events()
-
                 if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
                     back_button()
                     break
-
                 pygame.display.update()
 
         if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
@@ -262,7 +239,6 @@ def start_multiplayer_game():
             break
 
         draw_text_boxes(screen)
-
         pygame.display.update()
 
 
@@ -270,29 +246,22 @@ def start_multiplayer_game():
 
 # לולאת המשחק הראשית
 def main_menu():
-
     pygame.mouse.set_visible(True)
-
     while True:
-
         draw_background("assets/background_Treasure_Hunt.png")
-
         check_events()
 
         if draw_button(screen, "Single Player Game", HALF_WIDTH, HALF_HEIGHT - 100, 400, 50, (255, 255, 0), (0, 200, 0)):
+
             clean_the_window()
             start_single_player_game()
             pygame.mouse.set_visible(True)
             while True:
-
                 check_events()
-
                 if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
                     back_button()
                     break
                 pg.display.update()
-
-
 
         if draw_button(screen, "Multiplayer Game", HALF_WIDTH, HALF_HEIGHT, 400, 50, (255, 255, 0), (0, 200, 0)):
             clean_the_window()
@@ -318,20 +287,17 @@ def main_menu():
 
                 for text_surface, text_rect in text_objects:
                     screen.blit(text_surface, text_rect)  # צייר את הטקסט מחדש בכל פריים
-
                 check_events()
 
                 if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
                     back_button()
                     break
-
                 pygame.display.update()
 
 
         if draw_button(screen, "Quit", HALF_WIDTH, HALF_HEIGHT + 200, 400, 50, (255, 255, 0), (200, 0, 0)):
             pygame.quit()
             sys.exit()
-
 
         pygame.display.update()
 
