@@ -37,7 +37,7 @@ class Server:
         self.treasure = treasure_place()
         self.treasure_found = 0
         self.data_players = [[self.treasure_found, self.winner]]
-        self.start = 1
+        self.start = 0
         self.name_players = []
 
 
