@@ -1,5 +1,4 @@
 import math
-import json
 
 SERVER_PORT = 12335
 BROADCAST_PORT = 12344

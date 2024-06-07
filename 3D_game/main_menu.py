@@ -1,3 +1,5 @@
+import time
+
 import pygame
 from setting import *
 from server import *
@@ -42,12 +44,6 @@ def draw_text_boxes(screen):
         screen.blit(txt_surface, (box['rect'].x + 5, box['rect'].y + 5))
         pygame.draw.rect(screen, color, box['rect'], 2)
 
-
-
-
-
-
-"""//////////////////////////////////////////////////////////////////////"""
 
 
 # פונקציה ליצירת אובייקט טקסט
@@ -136,9 +132,12 @@ def create_server(name_player):
         if draw_button(screen, "Start", HALF_WIDTH, HALF_HEIGHT, 400, 50, (255, 255, 0), (0, 255, 0)):
             server.start = 1
             client.run_client()
+            server.start = -1
+            time.sleep(2.5)
             break
 
         if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
+            server.start = -1
             back_button()
             break
 
@@ -157,6 +156,7 @@ def join_to_other_server(ip_server, name_player):
 
     client = Client(server_ip=ip_server, name_player=name_player)
     if client.run_client():
+        time.sleep(2.5)
         return
     else:
         clean_the_window()
@@ -171,7 +171,6 @@ def join_to_other_server(ip_server, name_player):
 
 
 
-# לולאת המשחק הראשית של מסך ה-Multiplayer Game
 def start_multiplayer_game():
     global active_box
     global text_boxes
@@ -244,7 +243,6 @@ def start_multiplayer_game():
 
 
 
-# לולאת המשחק הראשית
 def main_menu():
     pygame.mouse.set_visible(True)
     while True:

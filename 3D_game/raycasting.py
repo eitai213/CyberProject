@@ -1,7 +1,6 @@
 import pygame as pg
-import math
 from setting import *
-
+import math
 
 class RayCasting:
     def __init__(self, game):
@@ -44,10 +43,8 @@ class RayCasting:
 
             # horizontals
             y_hor, dy = (y_map + 1, 1) if sin_a > 0 else (y_map - 1e-6, -1)
-
             depth_hor = (y_hor - oy) / sin_a
             x_hor = ox + depth_hor * cos_a
-
             delta_depth = dy / sin_a
             dx = delta_depth * cos_a
 
@@ -108,12 +105,12 @@ class RayCasting:
         for pos, value in self.game.map.world_map.items():
             if value == 3:
                 player_x, player_y = pos
-                dx = player_x - self.game.player.x
-                dy = player_y - self.game.player.y
+                dx = player_x - self.game.player.pos[0]
+                dy = player_y - self.game.player.pos[1]
                 distance = math.sqrt(dx * dx + dy * dy)
                 angle = math.atan2(dy, dx) - self.game.player.angle
 
-                if -HALF_FOV < angle < HALF_FOV:
+                if -HALF_FOV < angle < HALF_FOV and distance > 0.5:
                     depth = distance * math.cos(angle)
                     proj_height = SCREEN_DIST / (depth + 0.0001)
 
