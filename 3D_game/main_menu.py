@@ -184,9 +184,6 @@ def start_multiplayer_game():
 
     draw_text("input your name:", HALF_WIDTH, 35, 36)
     draw_text("input the IP server:", HALF_WIDTH - 300, HALF_HEIGHT - 100, 36)
-    draw_text("for quick join, press on the button", HALF_WIDTH - 300, HALF_HEIGHT + 170, 30)
-    draw_text("'join' without input any ip server", HALF_WIDTH - 300, HALF_HEIGHT + 190, 30)
-    draw_text("(if there is an active server)", HALF_WIDTH - 300, HALF_HEIGHT + 210, 30)
 
 
     while True:
@@ -219,6 +216,10 @@ def start_multiplayer_game():
 
         name_player = text_boxes[0]['text']
         ip_server = text_boxes[1]['text']
+
+        draw_text("for quick join, press on the button", HALF_WIDTH - 300, HALF_HEIGHT + 170, 30)
+        draw_text("'join' without input any ip server", HALF_WIDTH - 300, HALF_HEIGHT + 190, 30)
+        draw_text("(if there is an active server)", HALF_WIDTH - 300, HALF_HEIGHT + 210, 30)
 
         if draw_button(screen, "create server", HALF_WIDTH + 300, HALF_HEIGHT, 300, 150, (255, 255, 0), (0, 255, 0)):
             create_server(name_player)
