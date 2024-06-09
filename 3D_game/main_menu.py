@@ -1,9 +1,7 @@
-import time
-
 import pygame
 from setting import *
 from server import *
-from  client import *
+from client import *
 from game import *
 import sys
 
@@ -121,27 +119,35 @@ def start_single_player_game():
 
 def create_server(name_player):
     clean_the_window()
-    server = Server()
-    server_thread = threading.Thread(target=server.run_server, daemon=True)
-    server_thread.start()
-    draw_text(f"Server IP : {server.get_server_ip()}", HALF_WIDTH - 50, HALF_HEIGHT - 300, 80)
-    client = Client(server_ip=server.get_server_ip(), name_player=name_player)
+    try:
+        server = Server()
+        server_thread = threading.Thread(target=server.run_server, daemon=True)
+        server_thread.start()
 
-    while True:
-        check_events()
-        if draw_button(screen, "Start", HALF_WIDTH, HALF_HEIGHT, 400, 50, (255, 255, 0), (0, 255, 0)):
-            server.start = 1
-            client.run_client()
-            server.start = -1
-            time.sleep(2.5)
-            break
+        draw_text(f"Server IP : {server.get_server_ip()}", HALF_WIDTH - 50, HALF_HEIGHT - 300, 80)
+        client = Client(server_ip=server.get_server_ip(), name_player=name_player)
 
-        if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
-            server.start = -1
-            back_button()
-            break
+        while True:
+            check_events()
+            if draw_button(screen, "Start", HALF_WIDTH, HALF_HEIGHT, 400, 50, (255, 255, 0), (0, 255, 0)):
+                server.start = 1
+                client.run_client()
+                server.start = -1
+                time.sleep(2.5)
+                break
 
-        pygame.display.update()
+            if draw_button(screen, "back", HALF_WIDTH, HEIGHT - 100, 200, 50, (255, 255, 0), (0, 255, 0)):
+                server.start = -1
+                back_button()
+                break
+
+            pygame.display.update()
+
+    except OSError:
+        draw_text("can't create server,", HALF_WIDTH + 300, HALF_HEIGHT + 170, 30, (255, 0, 0))
+        draw_text("please quit and come in again.", HALF_WIDTH + 300, HALF_HEIGHT + 190, 30, (255, 0, 0))
+        start_multiplayer_game()
+        return
 
 
 def join_to_other_server(ip_server, name_player):
@@ -160,10 +166,7 @@ def join_to_other_server(ip_server, name_player):
         return
     else:
         clean_the_window()
-        large_text = pygame.font.Font(None, 30)
-        text_surf, text_rect = text_objects("server not found", large_text, (255, 0, 0))
-        text_rect.center = (HALF_WIDTH - 300, HALF_HEIGHT - 20)
-        screen.blit(text_surf, text_rect)
+        draw_text("server not found", HALF_WIDTH - 300, HALF_HEIGHT - 20, 30, (255, 0, 0))
         pygame.display.update()
         start_multiplayer_game()
 
@@ -181,9 +184,11 @@ def start_multiplayer_game():
 
     draw_text("input your name:", HALF_WIDTH, 35, 36)
     draw_text("input the IP server:", HALF_WIDTH - 300, HALF_HEIGHT - 100, 36)
+    draw_text("for quick join, press on the button", HALF_WIDTH - 300, HALF_HEIGHT + 170, 30)
+    draw_text("'join' without input any ip server", HALF_WIDTH - 300, HALF_HEIGHT + 190, 30)
+    draw_text("(if there is an active server)", HALF_WIDTH - 300, HALF_HEIGHT + 210, 30)
 
-    name_player = text_boxes[0]['text']
-    ip_server = text_boxes[1]['text']
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -212,7 +217,10 @@ def start_multiplayer_game():
                         else :
                             box['text'] += event.unicode
 
-        if draw_button(screen, "create room", HALF_WIDTH + 300, HALF_HEIGHT, 300, 150, (255, 255, 0), (0, 255, 0)):
+        name_player = text_boxes[0]['text']
+        ip_server = text_boxes[1]['text']
+
+        if draw_button(screen, "create server", HALF_WIDTH + 300, HALF_HEIGHT, 300, 150, (255, 255, 0), (0, 255, 0)):
             create_server(name_player)
             pygame.mouse.set_visible(True)
             while True:

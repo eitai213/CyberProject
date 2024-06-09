@@ -29,9 +29,9 @@ class ObjectRenderer:
 
     def draw_losing_background(self, name_player):
         self.screen.blit(self.losing_image, (0, 0))
-        large_text = pygame.font.Font(None, 40)
-        text_surf, text_rect = text_objects(str(name_player), large_text)
-        text_rect.center = (HALF_WIDTH, HALF_HEIGHT + 100)
+        large_text = pygame.font.Font(None, 100)
+        text_surf, text_rect = text_objects(str(name_player), large_text, WHITE)
+        text_rect.center = (HALF_WIDTH, HALF_HEIGHT + 130)
         self.screen.blit(text_surf, text_rect)
 
 
@@ -63,4 +63,3 @@ class ObjectRenderer:
             2: self.get_texture('assets/treasure.png'),
             3: self.get_texture('assets/other_player.png'),
         }
-    

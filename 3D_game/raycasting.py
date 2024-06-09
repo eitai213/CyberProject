@@ -1,6 +1,6 @@
 import pygame as pg
-from setting import *
 import math
+from setting import *
 
 class RayCasting:
     def __init__(self, game):
@@ -100,17 +100,18 @@ class RayCasting:
 
         if self.game.client_socket:
             self.add_players_to_render()
+            self.remove_flat_player_images()
 
     def add_players_to_render(self):
         for pos, value in self.game.map.world_map.items():
             if value == 3:
                 player_x, player_y = pos
-                dx = player_x - self.game.player.pos[0]
-                dy = player_y - self.game.player.pos[1]
+                dx = player_x - self.game.player.x
+                dy = player_y - self.game.player.y
                 distance = math.sqrt(dx * dx + dy * dy)
                 angle = math.atan2(dy, dx) - self.game.player.angle
 
-                if -HALF_FOV < angle < HALF_FOV and distance > 0.5:
+                if -HALF_FOV < angle < HALF_FOV:
                     depth = distance * math.cos(angle)
                     proj_height = SCREEN_DIST / (depth + 0.0001)
 
@@ -120,3 +121,8 @@ class RayCasting:
                         player_pos = (HALF_WIDTH + proj_height * math.tan(angle) - proj_height // 2,
                                       HALF_HEIGHT - proj_height // 2)
                         self.objects_to_render.append((depth, player_image, player_pos))
+
+    def remove_flat_player_images(self):
+        self.objects_to_render = [obj for obj in self.objects_to_render if obj[1] != self.textures[3]]
+
+
